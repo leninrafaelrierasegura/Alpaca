@@ -160,6 +160,7 @@ format_market_cap <- function(x) {
 }
 ```
 
+Data is downloaded daily from [here](https://www.nasdaq.com/market-activity/stocks/screener).
 
 ```{r}
 # 
@@ -609,6 +610,7 @@ datatable(
 
 ```{r}
 print("Listo y automatizado")
+format(Sys.time(), "%H:%M:%S")
 ```
 
 
