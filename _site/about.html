@@ -11,12 +11,12 @@
 
 
 
-<title>About This Website</title>
+<title>Alpaca</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -29,9 +29,18 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<script src="site_libs/clipboard-2.0.6/clipboard.min.js"></script>
+<link href="site_libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+<script src="site_libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+<script>window.xaringanExtraClipboard(null, {"button":"<i class=\"fa-solid fa-clipboard\" style=\"color: #00008B\"><\/i>","success":"<i class=\"fa fa-check\" style=\"color: #90BE6D\"><\/i>","error":"<i class=\"fa fa-times-circle\" style=\"color: #F94144\"><\/i>"})</script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -42,21 +51,150 @@
   ul.task-list{list-style: none;}
     </style>
 
-<style type="text/css">code{white-space: pre;}</style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
   }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
 }
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
 </script>
 
 
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
 
-
-
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -216,7 +354,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -226,6 +430,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -258,17 +472,429 @@ $(document).ready(function () {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">About This Website</h1>
+
+<h1 class="title toc-ignore">Alpaca</h1>
+<h4 class="date">25-04-2025.</h4>
 
 </div>
 
 
-<p>More about this website.</p>
+<style type="text/css">
+body .main-container {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+body {
+  max-width: 100% !important;
+}
+
+body, td {
+   font-size: 16px;
+}
+code.r{
+  font-size: 14px;
+}
+pre {
+  font-size: 14px
+}
+.custom-box {
+  background-color: #f5f7fa; /* Light grey-blue background */
+  border-color: #e1e8ed; /* Light border color */
+  color: #2c3e50; /* Dark text color */
+  padding: 15px; /* Padding inside the box */
+  border-radius: 5px; /* Rounded corners */
+  margin-bottom: 20px; /* Spacing below the box */
+}
+.caption {
+  margin: auto;
+  text-align: center;
+  margin-bottom: 20px; /* Spacing below the box */
+}
+</style>
+<p>Below we set some global options for all code chunks in this
+document.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Set seed for reproducibility</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1982</span>) </span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># Set global options for all code chunks</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="co"># Disable messages printed by R code chunks</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="at">message =</span> <span class="cn">FALSE</span>,    </span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="co"># Disable warnings printed by R code chunks</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">warning =</span> <span class="cn">FALSE</span>,    </span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="co"># Show R code within code chunks in output</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="at">echo =</span> <span class="cn">TRUE</span>,        </span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="co"># Include both R code and its results in output</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">include =</span> <span class="cn">TRUE</span>,     </span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>  <span class="co"># Evaluate R code chunks</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>  <span class="at">eval =</span> <span class="cn">TRUE</span>,       </span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>  <span class="co"># Enable caching of R code chunks for faster rendering</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>  <span class="at">cache =</span> <span class="cn">FALSE</span>,      </span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>  <span class="co"># Align figures in the center of the output</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>  <span class="at">fig.align =</span> <span class="st">&quot;center&quot;</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>  <span class="co"># Enable retina display for high-resolution figures</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>  <span class="at">retina =</span> <span class="dv">2</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>  <span class="co"># Show errors in the output instead of stopping rendering</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>  <span class="at">error =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>  <span class="co"># Do not collapse code and output into a single block</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>  <span class="at">collapse =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>)</span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co"># Start the figure counter</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>fig_count <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co"># Define the captioner function</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>captioner <span class="ot">&lt;-</span> <span class="cf">function</span>(caption) {</span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>  fig_count <span class="ot">&lt;&lt;-</span> fig_count <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="st">&quot;Figure &quot;</span>, fig_count, <span class="st">&quot;: &quot;</span>, caption)</span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a>}</span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="co"># Define the function to truncate a number to two decimal places</span></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a>truncate_to_two <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a>  <span class="fu">floor</span>(x <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">/</span> <span class="dv">100</span></span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Load required libraries</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">library</span>(zoo) <span class="co"># to use na.locf</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">library</span>(tidyr) <span class="co"># to use pivot_wider</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">library</span>(slackr)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">library</span>(grateful)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>initial_date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">&quot;2025-04-24&quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>today <span class="ot">&lt;-</span> <span class="fu">Sys.Date</span>()</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;keys.R&quot;</span>))</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="fu">slackr_setup</span>(<span class="at">token =</span> token)</span></code></pre></div>
+<pre><code>## [1] &quot;Successfully connected to Slack&quot;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Function to format market cap in millions with 1 decimal and &quot;M&quot; suffix</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>format_market_cap <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">sapply</span>(x, <span class="cf">function</span>(val) {</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.na</span>(val)) {</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>      <span class="fu">return</span>(<span class="st">&quot;NA&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    }</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>    </span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    val <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(val)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    </span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    <span class="cf">if</span> (val <span class="sc">&gt;=</span> <span class="fl">1e12</span>) {</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>      <span class="fu">return</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%.1fT&quot;</span>, val <span class="sc">/</span> <span class="fl">1e12</span>))</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (val <span class="sc">&gt;=</span> <span class="fl">1e9</span>) {</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>      <span class="fu">return</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%.1fB&quot;</span>, val <span class="sc">/</span> <span class="fl">1e9</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (val <span class="sc">&gt;=</span> <span class="fl">1e6</span>) {</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>      <span class="fu">return</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%.1fM&quot;</span>, val <span class="sc">/</span> <span class="fl">1e6</span>))</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (val <span class="sc">&gt;=</span> <span class="fl">1e3</span>) {</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>      <span class="fu">return</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%.1fk&quot;</span>, val <span class="sc">/</span> <span class="fl">1e3</span>))</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>      <span class="fu">return</span>(<span class="fu">as.character</span>(val))</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>    }</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  })</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># # Define the API URL</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co"># url &lt;- &quot;https://api.nasdaq.com/api/screener/stocks?tableonly=true&amp;limit=25&amp;offset=0&amp;download=true&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># # Set headers to mimic a browser</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co"># headers &lt;- add_headers(`User-Agent` = &quot;Mozilla/5.0&quot;)</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co"># # Send GET request</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># response &lt;- GET(url, headers)</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co"># # Check status</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co"># if (status_code(response) == 200) {</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#   # Parse JSON content</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#   content_json &lt;- content(response, &quot;text&quot;, encoding = &quot;UTF-8&quot;)</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#   data_list &lt;- fromJSON(content_json, flatten = TRUE)</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#   # Extract rows from JSON</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#   stock_data &lt;- data_list$data$rows</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#   # Add current date column</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#   stock_data$date &lt;- Sys.Date()</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#   # Convert to data frame and save to CSV</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#   write_csv(stock_data, &quot;nasdaq_screener.csv&quot;)</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#   cat(&quot;✅ Data saved to &#39;nasdaq_screener.csv&#39;\n&quot;)</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co"># } else {</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#   cat(&quot;❌ Failed to fetch data. Status code:&quot;, status_code(response), &quot;\n&quot;)</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co"># }</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>today_stock_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">&quot;nasdaq_screener.csv&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(symbol)<span class="sc">&lt;</span><span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="co"># filter out stocks with more than 4 characters (not tradeable)</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>name, <span class="sc">-</span>url, <span class="sc">-</span>netchange, <span class="sc">-</span>pctchange) <span class="sc">|&gt;</span> <span class="co"># remove unnecessary columns</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lastsale =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">&quot;[$,]&quot;</span>, <span class="st">&quot;&quot;</span>, lastsale))) <span class="sc">|&gt;</span><span class="co"># remove $ and , from lastsale and make it numeric</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>  <span class="fu">select</span>(symbol, date, lastsale, <span class="fu">everything</span>()) <span class="co"># reorder columns</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co"># Remove symbols that are not longer being traded</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>cummulative_stock_data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">&quot;cummulative_stock_data.RDS&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>  <span class="fu">filter</span>(symbol <span class="sc">%in%</span> today_stock_data<span class="sc">$</span>symbol)</span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co"># The following two instructions deals with new_data being added when it is already there.</span></span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a><span class="co"># This might happen when the stock market is closed during weekdays</span></span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> <span class="fu">anti_join</span>(today_stock_data, </span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>                      cummulative_stock_data, </span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>                      <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;symbol&quot;</span>, <span class="st">&quot;date&quot;</span>))</span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a>clean_cummulative_stock_data <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cummulative_stock_data, new_data) <span class="sc">|&gt;</span></span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a>  <span class="fu">arrange</span>(symbol, date)</span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a><span class="co"># Fill NA values backward</span></span>
+<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a>stock_data_filled <span class="ot">&lt;-</span> clean_cummulative_stock_data <span class="sc">|&gt;</span></span>
+<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a>  <span class="fu">group_by</span>(symbol) <span class="sc">|&gt;</span></span>
+<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a>  <span class="fu">arrange</span>(date, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lastsale =</span> <span class="fu">na.locf</span>(lastsale, <span class="at">fromLast =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a>  <span class="fu">arrange</span>(symbol, date)</span>
+<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a></span>
+<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a><span class="co"># The first filter ensures that we only keep stocks that have a positive growth trend  </span></span>
+<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co"># The second filter ensures that the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%)</span></span>
+<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a>stocks_data_grow <span class="ot">&lt;-</span> stock_data_filled <span class="sc">|&gt;</span></span>
+<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a>  <span class="fu">group_by</span>(symbol) <span class="sc">|&gt;</span></span>
+<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a>  <span class="fu">arrange</span>(date, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">first</span>(lastsale) <span class="sc">&lt;=</span> <span class="fu">last</span>(lastsale)) <span class="sc">|&gt;</span> <span class="co"># ensure positive growth trend</span></span>
+<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a>  <span class="fu">filter</span>({</span>
+<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a>    next_adj <span class="ot">&lt;-</span> <span class="fu">lead</span>(lastsale)</span>
+<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a>    <span class="fu">all</span>((next_adj <span class="sc">&gt;</span> <span class="fl">0.8</span> <span class="sc">*</span> lastsale) <span class="sc">&amp;</span> (next_adj <span class="sc">&lt;</span> <span class="dv">2</span> <span class="sc">*</span> lastsale), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a>  }) <span class="sc">|&gt;</span></span>
+<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a></span>
+<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a><span class="co"># Compute the percentage change from the start date </span></span>
+<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a><span class="co"># Keep only those stocks where the final price growth is at least half of the highest growth (before the end).</span></span>
+<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a>stock_data_pct_change <span class="ot">&lt;-</span> stocks_data_grow <span class="sc">|&gt;</span></span>
+<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a>  <span class="fu">group_by</span>(symbol) <span class="sc">|&gt;</span></span>
+<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a>  <span class="fu">arrange</span>(date, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">daily_pct_change =</span> (lastsale <span class="sc">-</span> <span class="fu">lag</span>(lastsale)) <span class="sc">/</span> <span class="fu">lag</span>(lastsale) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a>         <span class="at">pct_change =</span> (lastsale <span class="sc">-</span> <span class="fu">first</span>(lastsale)) <span class="sc">/</span> <span class="fu">first</span>(lastsale) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a>  <span class="fu">filter</span>((<span class="fu">max</span>(<span class="fu">head</span>(pct_change, <span class="sc">-</span><span class="dv">1</span>)) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">&lt;=</span> <span class="fu">last</span>(pct_change)) <span class="sc">|&gt;</span> <span class="co"># max{first, ..., last-1} / 2 &lt;= last</span></span>
+<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span>
+<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a></span>
+<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a><span class="co"># Filter symbols that have fallen (anytime) more that what they have grown (at the end)</span></span>
+<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a>symbols_with_negative_pct_change <span class="ot">&lt;-</span> stock_data_pct_change <span class="sc">|&gt;</span></span>
+<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a>  <span class="fu">group_by</span>(symbol) <span class="sc">|&gt;</span></span>
+<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a>  <span class="fu">arrange</span>(date, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">any</span>(pct_change <span class="sc">&lt;</span> <span class="dv">0</span>)) <span class="sc">|&gt;</span> <span class="co"># this filter is so that the next make sense</span></span>
+<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">abs</span>(<span class="fu">min</span>(pct_change)) <span class="sc">&gt;</span> <span class="fu">last</span>(pct_change)) <span class="sc">|&gt;</span></span>
+<span id="cb5-79"><a href="#cb5-79" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-80"><a href="#cb5-80" tabindex="-1"></a>  <span class="fu">distinct</span>(symbol) <span class="sc">|&gt;</span></span>
+<span id="cb5-81"><a href="#cb5-81" tabindex="-1"></a>  <span class="fu">pull</span>(symbol)</span>
+<span id="cb5-82"><a href="#cb5-82" tabindex="-1"></a></span>
+<span id="cb5-83"><a href="#cb5-83" tabindex="-1"></a><span class="co"># Filter out those symbols from stock_data_pct_change</span></span>
+<span id="cb5-84"><a href="#cb5-84" tabindex="-1"></a><span class="co"># This ensures that have grown more that they have fallen</span></span>
+<span id="cb5-85"><a href="#cb5-85" tabindex="-1"></a>stock_data_pct_change_that_grow <span class="ot">&lt;-</span> stock_data_pct_change <span class="sc">|&gt;</span></span>
+<span id="cb5-86"><a href="#cb5-86" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>symbol <span class="sc">%in%</span> symbols_with_negative_pct_change)</span>
+<span id="cb5-87"><a href="#cb5-87" tabindex="-1"></a></span>
+<span id="cb5-88"><a href="#cb5-88" tabindex="-1"></a>aux <span class="ot">&lt;-</span> stock_data_pct_change_that_grow <span class="sc">|&gt;</span></span>
+<span id="cb5-89"><a href="#cb5-89" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">!=</span> <span class="fu">min</span>(date))</span>
+<span id="cb5-90"><a href="#cb5-90" tabindex="-1"></a></span>
+<span id="cb5-91"><a href="#cb5-91" tabindex="-1"></a></span>
+<span id="cb5-92"><a href="#cb5-92" tabindex="-1"></a><span class="co"># From here on there are no more filters</span></span>
+<span id="cb5-93"><a href="#cb5-93" tabindex="-1"></a></span>
+<span id="cb5-94"><a href="#cb5-94" tabindex="-1"></a></span>
+<span id="cb5-95"><a href="#cb5-95" tabindex="-1"></a><span class="co"># The following contains the information of the surviving symbols</span></span>
+<span id="cb5-96"><a href="#cb5-96" tabindex="-1"></a>info_of_surviving_symbols <span class="ot">&lt;-</span> aux <span class="sc">|&gt;</span></span>
+<span id="cb5-97"><a href="#cb5-97" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> <span class="fu">max</span>(date)) <span class="sc">|&gt;</span></span>
+<span id="cb5-98"><a href="#cb5-98" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>date, <span class="sc">-</span>lastsale, <span class="sc">-</span>daily_pct_change, pct_change) <span class="sc">|&gt;</span></span>
+<span id="cb5-99"><a href="#cb5-99" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">marketCap_formatted =</span> <span class="fu">format_market_cap</span>(marketCap))</span>
+<span id="cb5-100"><a href="#cb5-100" tabindex="-1"></a>  </span>
+<span id="cb5-101"><a href="#cb5-101" tabindex="-1"></a>countries <span class="ot">&lt;-</span> info_of_surviving_symbols <span class="sc">|&gt;</span></span>
+<span id="cb5-102"><a href="#cb5-102" tabindex="-1"></a>  <span class="fu">select</span>(country) <span class="sc">|&gt;</span></span>
+<span id="cb5-103"><a href="#cb5-103" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-104"><a href="#cb5-104" tabindex="-1"></a>  <span class="fu">arrange</span>(country) <span class="sc">|&gt;</span></span>
+<span id="cb5-105"><a href="#cb5-105" tabindex="-1"></a>  <span class="fu">pull</span>(country)</span>
+<span id="cb5-106"><a href="#cb5-106" tabindex="-1"></a></span>
+<span id="cb5-107"><a href="#cb5-107" tabindex="-1"></a>industries <span class="ot">&lt;-</span> info_of_surviving_symbols <span class="sc">|&gt;</span></span>
+<span id="cb5-108"><a href="#cb5-108" tabindex="-1"></a>  <span class="fu">select</span>(industry) <span class="sc">|&gt;</span></span>
+<span id="cb5-109"><a href="#cb5-109" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-110"><a href="#cb5-110" tabindex="-1"></a>  <span class="fu">arrange</span>(industry) <span class="sc">|&gt;</span></span>
+<span id="cb5-111"><a href="#cb5-111" tabindex="-1"></a>  <span class="fu">pull</span>(industry)</span>
+<span id="cb5-112"><a href="#cb5-112" tabindex="-1"></a></span>
+<span id="cb5-113"><a href="#cb5-113" tabindex="-1"></a>sectors <span class="ot">&lt;-</span> info_of_surviving_symbols <span class="sc">|&gt;</span></span>
+<span id="cb5-114"><a href="#cb5-114" tabindex="-1"></a>  <span class="fu">select</span>(sector) <span class="sc">|&gt;</span></span>
+<span id="cb5-115"><a href="#cb5-115" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-116"><a href="#cb5-116" tabindex="-1"></a>  <span class="fu">arrange</span>(sector) <span class="sc">|&gt;</span></span>
+<span id="cb5-117"><a href="#cb5-117" tabindex="-1"></a>  <span class="fu">pull</span>(sector)</span>
+<span id="cb5-118"><a href="#cb5-118" tabindex="-1"></a></span>
+<span id="cb5-119"><a href="#cb5-119" tabindex="-1"></a><span class="co"># Compute the rank for each date</span></span>
+<span id="cb5-120"><a href="#cb5-120" tabindex="-1"></a>aux_ranked <span class="ot">&lt;-</span> aux <span class="sc">|&gt;</span> </span>
+<span id="cb5-121"><a href="#cb5-121" tabindex="-1"></a>  <span class="fu">group_by</span>(date) <span class="sc">|&gt;</span></span>
+<span id="cb5-122"><a href="#cb5-122" tabindex="-1"></a>  <span class="fu">arrange</span>(pct_change) <span class="sc">|&gt;</span></span>
+<span id="cb5-123"><a href="#cb5-123" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb5-124"><a href="#cb5-124" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-125"><a href="#cb5-125" tabindex="-1"></a>  <span class="fu">arrange</span>(symbol,date)</span>
+<span id="cb5-126"><a href="#cb5-126" tabindex="-1"></a></span>
+<span id="cb5-127"><a href="#cb5-127" tabindex="-1"></a><span class="co"># Compute last day rank</span></span>
+<span id="cb5-128"><a href="#cb5-128" tabindex="-1"></a>last_day_rank <span class="ot">&lt;-</span> aux_ranked <span class="sc">|&gt;</span></span>
+<span id="cb5-129"><a href="#cb5-129" tabindex="-1"></a>  <span class="fu">group_by</span>(symbol) <span class="sc">|&gt;</span></span>
+<span id="cb5-130"><a href="#cb5-130" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> <span class="fu">max</span>(date)) <span class="sc">|&gt;</span></span>
+<span id="cb5-131"><a href="#cb5-131" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">last_rank =</span> rank) <span class="sc">|&gt;</span></span>
+<span id="cb5-132"><a href="#cb5-132" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-133"><a href="#cb5-133" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(last_rank))</span>
+<span id="cb5-134"><a href="#cb5-134" tabindex="-1"></a></span>
+<span id="cb5-135"><a href="#cb5-135" tabindex="-1"></a><span class="co"># Compute the sum of ranks </span></span>
+<span id="cb5-136"><a href="#cb5-136" tabindex="-1"></a>sum_rank <span class="ot">&lt;-</span> aux_ranked <span class="sc">|&gt;</span></span>
+<span id="cb5-137"><a href="#cb5-137" tabindex="-1"></a>  <span class="fu">group_by</span>(symbol) <span class="sc">|&gt;</span></span>
+<span id="cb5-138"><a href="#cb5-138" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">sum_rank =</span> <span class="fu">sum</span>(rank)) <span class="sc">|&gt;</span></span>
+<span id="cb5-139"><a href="#cb5-139" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-140"><a href="#cb5-140" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(sum_rank))</span>
+<span id="cb5-141"><a href="#cb5-141" tabindex="-1"></a></span>
+<span id="cb5-142"><a href="#cb5-142" tabindex="-1"></a><span class="co"># Create the table of ranks</span></span>
+<span id="cb5-143"><a href="#cb5-143" tabindex="-1"></a>table_of_ranks <span class="ot">&lt;-</span> aux_ranked <span class="sc">%&gt;%</span></span>
+<span id="cb5-144"><a href="#cb5-144" tabindex="-1"></a>  <span class="fu">select</span>(symbol, date, rank) <span class="sc">%&gt;%</span></span>
+<span id="cb5-145"><a href="#cb5-145" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb5-146"><a href="#cb5-146" tabindex="-1"></a>    <span class="at">names_from =</span> date,</span>
+<span id="cb5-147"><a href="#cb5-147" tabindex="-1"></a>    <span class="at">values_from =</span> rank</span>
+<span id="cb5-148"><a href="#cb5-148" tabindex="-1"></a>  )</span>
+<span id="cb5-149"><a href="#cb5-149" tabindex="-1"></a></span>
+<span id="cb5-150"><a href="#cb5-150" tabindex="-1"></a><span class="co"># assume first column is &#39;symbol&#39;</span></span>
+<span id="cb5-151"><a href="#cb5-151" tabindex="-1"></a>ranking_accumulated <span class="ot">&lt;-</span> table_of_ranks</span>
+<span id="cb5-152"><a href="#cb5-152" tabindex="-1"></a></span>
+<span id="cb5-153"><a href="#cb5-153" tabindex="-1"></a><span class="co"># Get only the numeric part (the ranks)</span></span>
+<span id="cb5-154"><a href="#cb5-154" tabindex="-1"></a>rank_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(table_of_ranks[,<span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb5-155"><a href="#cb5-155" tabindex="-1"></a></span>
+<span id="cb5-156"><a href="#cb5-156" tabindex="-1"></a><span class="co"># Apply the custom accumulation logic row-wise</span></span>
+<span id="cb5-157"><a href="#cb5-157" tabindex="-1"></a>accumulated_matrix <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">apply</span>(rank_matrix, <span class="dv">1</span>, <span class="cf">function</span>(row) {</span>
+<span id="cb5-158"><a href="#cb5-158" tabindex="-1"></a>  acc <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">length</span>(row))</span>
+<span id="cb5-159"><a href="#cb5-159" tabindex="-1"></a>  acc[<span class="dv">1</span>] <span class="ot">&lt;-</span> row[<span class="dv">1</span>]</span>
+<span id="cb5-160"><a href="#cb5-160" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="fu">length</span>(row)) {</span>
+<span id="cb5-161"><a href="#cb5-161" tabindex="-1"></a>    <span class="cf">if</span> (row[i] <span class="sc">&gt;=</span> row[i <span class="sc">-</span> <span class="dv">1</span>]) {</span>
+<span id="cb5-162"><a href="#cb5-162" tabindex="-1"></a>      acc[i] <span class="ot">&lt;-</span> acc[i <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">+</span> row[i]</span>
+<span id="cb5-163"><a href="#cb5-163" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb5-164"><a href="#cb5-164" tabindex="-1"></a>      acc[i] <span class="ot">&lt;-</span> acc[i <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">-</span> row[i]</span>
+<span id="cb5-165"><a href="#cb5-165" tabindex="-1"></a>    }</span>
+<span id="cb5-166"><a href="#cb5-166" tabindex="-1"></a>  }</span>
+<span id="cb5-167"><a href="#cb5-167" tabindex="-1"></a>  <span class="fu">return</span>(acc)</span>
+<span id="cb5-168"><a href="#cb5-168" tabindex="-1"></a>}))</span>
+<span id="cb5-169"><a href="#cb5-169" tabindex="-1"></a></span>
+<span id="cb5-170"><a href="#cb5-170" tabindex="-1"></a><span class="co"># Combine with symbols again</span></span>
+<span id="cb5-171"><a href="#cb5-171" tabindex="-1"></a>ranking_accumulated[,<span class="sc">-</span><span class="dv">1</span>] <span class="ot">&lt;-</span> accumulated_matrix</span>
+<span id="cb5-172"><a href="#cb5-172" tabindex="-1"></a></span>
+<span id="cb5-173"><a href="#cb5-173" tabindex="-1"></a>acc_rank <span class="ot">&lt;-</span> ranking_accumulated[, <span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">ncol</span>(ranking_accumulated))] <span class="sc">|&gt;</span> </span>
+<span id="cb5-174"><a href="#cb5-174" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">acc_rank =</span> <span class="fu">colnames</span>(ranking_accumulated)[<span class="fu">ncol</span>(ranking_accumulated)]) <span class="sc">|&gt;</span></span>
+<span id="cb5-175"><a href="#cb5-175" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(acc_rank))</span>
+<span id="cb5-176"><a href="#cb5-176" tabindex="-1"></a></span>
+<span id="cb5-177"><a href="#cb5-177" tabindex="-1"></a></span>
+<span id="cb5-178"><a href="#cb5-178" tabindex="-1"></a><span class="co"># Augment the ranks with info</span></span>
+<span id="cb5-179"><a href="#cb5-179" tabindex="-1"></a>aug_acc_rank <span class="ot">&lt;-</span> acc_rank <span class="sc">|&gt;</span></span>
+<span id="cb5-180"><a href="#cb5-180" tabindex="-1"></a>  <span class="fu">inner_join</span>(info_of_surviving_symbols, <span class="at">by =</span> <span class="st">&quot;symbol&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-181"><a href="#cb5-181" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(acc_rank)) <span class="sc">|&gt;</span></span>
+<span id="cb5-182"><a href="#cb5-182" tabindex="-1"></a>  <span class="fu">select</span>(symbol, acc_rank, <span class="fu">everything</span>())</span>
+<span id="cb5-183"><a href="#cb5-183" tabindex="-1"></a></span>
+<span id="cb5-184"><a href="#cb5-184" tabindex="-1"></a>aug_sum_rank <span class="ot">&lt;-</span> sum_rank <span class="sc">|&gt;</span></span>
+<span id="cb5-185"><a href="#cb5-185" tabindex="-1"></a>  <span class="fu">inner_join</span>(info_of_surviving_symbols, <span class="at">by =</span> <span class="st">&quot;symbol&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-186"><a href="#cb5-186" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(sum_rank)) <span class="sc">|&gt;</span></span>
+<span id="cb5-187"><a href="#cb5-187" tabindex="-1"></a>  <span class="fu">select</span>(symbol, sum_rank, <span class="fu">everything</span>())</span>
+<span id="cb5-188"><a href="#cb5-188" tabindex="-1"></a></span>
+<span id="cb5-189"><a href="#cb5-189" tabindex="-1"></a>aug_last_day_rank <span class="ot">&lt;-</span> last_day_rank <span class="sc">|&gt;</span></span>
+<span id="cb5-190"><a href="#cb5-190" tabindex="-1"></a>  <span class="fu">inner_join</span>(info_of_surviving_symbols, <span class="at">by =</span> <span class="st">&quot;symbol&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-191"><a href="#cb5-191" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(last_rank)) <span class="sc">|&gt;</span></span>
+<span id="cb5-192"><a href="#cb5-192" tabindex="-1"></a>  <span class="fu">select</span>(symbol, last_rank, <span class="fu">everything</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">cite_packages</span>(<span class="at">output =</span> <span class="st">&quot;paragraph&quot;</span>, <span class="at">out.dir =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
+<p>We used R version 4.4.3 <span class="citation">(R Core Team
+2025)</span> and the following R packages: here v. 1.0.1 <span
+class="citation">(Müller 2020)</span>, htmltools v. 0.5.8.1 <span
+class="citation">(Cheng et al. 2024)</span>, knitr v. 1.50 <span
+class="citation">(Xie 2014, 2015, 2025)</span>, renv v. 1.0.7 <span
+class="citation">(Ushey and Wickham 2024)</span>, rmarkdown v. 2.29
+<span class="citation">(Xie, Allaire, and Grolemund 2018; Xie, Dervieux,
+and Riederer 2020; Allaire et al. 2024)</span>, slackr v. 3.3.1 <span
+class="citation">(Rudis et al. 2023)</span>, tidyverse v. 2.0.0 <span
+class="citation">(Wickham et al. 2019)</span>, xaringanExtra v. 0.8.0
+<span class="citation">(Aden-Buie and Warkentin 2024)</span>, zoo v.
+1.8.14 <span class="citation">(Zeileis and Grothendieck
+2005)</span>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
+<div id="ref-xaringanExtra" class="csl-entry">
+Aden-Buie, Garrick, and Matthew T. Warkentin. 2024. <em><span
+class="nocase">xaringanExtra</span>: Extras and Extensions for
+<span>“<span class="nocase">xaringan</span>”</span> Slides</em>. <a
+href="https://CRAN.R-project.org/package=xaringanExtra">https://CRAN.R-project.org/package=xaringanExtra</a>.
+</div>
+<div id="ref-rmarkdown2024" class="csl-entry">
+Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
+Luraschi, Kevin Ushey, Aron Atkins, et al. 2024. <em><span
+class="nocase">rmarkdown</span>: Dynamic Documents for r</em>. <a
+href="https://github.com/rstudio/rmarkdown">https://github.com/rstudio/rmarkdown</a>.
+</div>
+<div id="ref-htmltools" class="csl-entry">
+Cheng, Joe, Carson Sievert, Barret Schloerke, Winston Chang, Yihui Xie,
+and Jeff Allen. 2024. <em><span class="nocase">htmltools</span>: Tools
+for HTML</em>. <a
+href="https://CRAN.R-project.org/package=htmltools">https://CRAN.R-project.org/package=htmltools</a>.
+</div>
+<div id="ref-here" class="csl-entry">
+Müller, Kirill. 2020. <em><span class="nocase">here</span>: A Simpler
+Way to Find Your Files</em>. <a
+href="https://CRAN.R-project.org/package=here">https://CRAN.R-project.org/package=here</a>.
+</div>
+<div id="ref-base" class="csl-entry">
+R Core Team. 2025. <em><span>R</span>: A Language and Environment for
+Statistical Computing</em>. Vienna, Austria: R Foundation for
+Statistical Computing. <a
+href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-slackr" class="csl-entry">
+Rudis, Bob, Jay Jacobs, David Severski, Quinn Weber, Konrad Karczewski,
+Shinya Uryu, Gregory Jefferis, et al. 2023. <em><span
+class="nocase">slackr</span>: Send Messages, Images, r Objects and Files
+to <span>“<span>Slack</span>”</span> Channels/Users</em>. <a
+href="https://CRAN.R-project.org/package=slackr">https://CRAN.R-project.org/package=slackr</a>.
+</div>
+<div id="ref-renv" class="csl-entry">
+Ushey, Kevin, and Hadley Wickham. 2024. <em><span
+class="nocase">renv</span>: Project Environments</em>. <a
+href="https://CRAN.R-project.org/package=renv">https://CRAN.R-project.org/package=renv</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy
+D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019.
+<span>“Welcome to the <span class="nocase">tidyverse</span>.”</span>
+<em>Journal of Open Source Software</em> 4 (43): 1686. <a
+href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-knitr2014" class="csl-entry">
+Xie, Yihui. 2014. <span>“<span class="nocase">knitr</span>: A
+Comprehensive Tool for Reproducible Research in <span>R</span>.”</span>
+In <em>Implementing Reproducible Computational Research</em>, edited by
+Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman;
+Hall/CRC.
+</div>
+<div id="ref-knitr2015" class="csl-entry">
+———. 2015. <em>Dynamic Documents with <span>R</span> and Knitr</em>. 2nd
+ed. Boca Raton, Florida: Chapman; Hall/CRC. <a
+href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-knitr2025" class="csl-entry">
+———. 2025. <em><span class="nocase">knitr</span>: A General-Purpose
+Package for Dynamic Report Generation in <span>R</span></em>. <a
+href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-rmarkdown2018" class="csl-entry">
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown:
+The Definitive Guide</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a
+href="https://bookdown.org/yihui/rmarkdown">https://bookdown.org/yihui/rmarkdown</a>.
+</div>
+<div id="ref-rmarkdown2020" class="csl-entry">
+Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. <em>R
+Markdown Cookbook</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a
+href="https://bookdown.org/yihui/rmarkdown-cookbook">https://bookdown.org/yihui/rmarkdown-cookbook</a>.
+</div>
+<div id="ref-zoo" class="csl-entry">
+Zeileis, Achim, and Gabor Grothendieck. 2005. <span>“<span
+class="nocase">zoo</span>: S3 Infrastructure for Regular and Irregular
+Time Series.”</span> <em>Journal of Statistical Software</em> 14 (6):
+1–27. <a
+href="https://doi.org/10.18637/jss.v014.i06">https://doi.org/10.18637/jss.v014.i06</a>.
+</div>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQWxwYWNhIgpkYXRlOiAiYHIgZm9ybWF0KFN5cy50aW1lKCksICclZC0lbS0lWS4nKWAiCm91dHB1dDoKICBodG1sX2RvY3VtZW50OgogICAgbWF0aGpheDogImh0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vbWF0aGpheEAzL2VzNS90ZXgtbW1sLWNodG1sLmpzIgogICAgaGlnaGxpZ2h0OiBweWdtZW50cwogICAgdGhlbWU6IGZsYXRseQogICAgY29kZV9mb2xkaW5nOiBzaG93ICMgY2xhc3Muc291cmNlID0gImZvbGQtaGlkZSIgdG8gaGlkZSBjb2RlIGFuZCBhZGQgYSBidXR0b24gdG8gc2hvdyBpdAogICAgIyBkZl9wcmludDogcGFnZWQKICAgIHRvYzogdHJ1ZQogICAgdG9jX2Zsb2F0OgogICAgICBjb2xsYXBzZWQ6IHRydWUKICAgICAgc21vb3RoX3Njcm9sbDogdHJ1ZQogICAgbnVtYmVyX3NlY3Rpb25zOiBmYWxzZQogICAgZmlnX2NhcHRpb246IHRydWUKICAgIGNvZGVfZG93bmxvYWQ6IHRydWUKYWx3YXlzX2FsbG93X2h0bWw6IHRydWUKYmlibGlvZ3JhcGh5OiAKICAtIGdyYXRlZnVsLXJlZnMuYmliCmhlYWRlci1pbmNsdWRlczoKICAtIFxuZXdjb21tYW5ke1xhcn17XG1hdGhiYntSfX0KICAtIFxuZXdjb21tYW5ke1xsbGF2fVsxXXtcbGVmdFx7IzFccmlnaHRcfX0KICAtIFxuZXdjb21tYW5ke1xwYXJlfVsxXXtcbGVmdCgjMVxyaWdodCl9CiAgLSBcbmV3Y29tbWFuZHtcTmNhbH17XG1hdGhjYWx7Tn19CiAgLSBcbmV3Y29tbWFuZHtcVmNhbH17XG1hdGhjYWx7Vn19CiAgLSBcbmV3Y29tbWFuZHtcRWNhbH17XG1hdGhjYWx7RX19CiAgLSBcbmV3Y29tbWFuZHtcV2NhbH17XG1hdGhjYWx7V319Ci0tLQoKYGBge3IgeGFyaW5nYW5FeHRyYS1jbGlwYm9hcmQsIGVjaG8gPSBGQUxTRX0KaHRtbHRvb2xzOjp0YWdMaXN0KAogIHhhcmluZ2FuRXh0cmE6OnVzZV9jbGlwYm9hcmQoCiAgICBidXR0b25fdGV4dCA9ICI8aSBjbGFzcz1cImZhLXNvbGlkIGZhLWNsaXBib2FyZFwiIHN0eWxlPVwiY29sb3I6ICMwMDAwOEJcIj48L2k+IiwKICAgIHN1Y2Nlc3NfdGV4dCA9ICI8aSBjbGFzcz1cImZhIGZhLWNoZWNrXCIgc3R5bGU9XCJjb2xvcjogIzkwQkU2RFwiPjwvaT4iLAogICAgZXJyb3JfdGV4dCA9ICI8aSBjbGFzcz1cImZhIGZhLXRpbWVzLWNpcmNsZVwiIHN0eWxlPVwiY29sb3I6ICNGOTQxNDRcIj48L2k+IgogICksCiAgcm1hcmtkb3duOjpodG1sX2RlcGVuZGVuY3lfZm9udF9hd2Vzb21lKCkKKQpgYGAKCgpgYGB7Y3NzLCBlY2hvID0gRkFMU0V9CmJvZHkgLm1haW4tY29udGFpbmVyIHsKICBtYXgtd2lkdGg6IDEwMCUgIWltcG9ydGFudDsKICB3aWR0aDogMTAwJSAhaW1wb3J0YW50Owp9CmJvZHkgewogIG1heC13aWR0aDogMTAwJSAhaW1wb3J0YW50Owp9Cgpib2R5LCB0ZCB7CiAgIGZvbnQtc2l6ZTogMTZweDsKfQpjb2RlLnJ7CiAgZm9udC1zaXplOiAxNHB4Owp9CnByZSB7CiAgZm9udC1zaXplOiAxNHB4Cn0KLmN1c3RvbS1ib3ggewogIGJhY2tncm91bmQtY29sb3I6ICNmNWY3ZmE7IC8qIExpZ2h0IGdyZXktYmx1ZSBiYWNrZ3JvdW5kICovCiAgYm9yZGVyLWNvbG9yOiAjZTFlOGVkOyAvKiBMaWdodCBib3JkZXIgY29sb3IgKi8KICBjb2xvcjogIzJjM2U1MDsgLyogRGFyayB0ZXh0IGNvbG9yICovCiAgcGFkZGluZzogMTVweDsgLyogUGFkZGluZyBpbnNpZGUgdGhlIGJveCAqLwogIGJvcmRlci1yYWRpdXM6IDVweDsgLyogUm91bmRlZCBjb3JuZXJzICovCiAgbWFyZ2luLWJvdHRvbTogMjBweDsgLyogU3BhY2luZyBiZWxvdyB0aGUgYm94ICovCn0KLmNhcHRpb24gewogIG1hcmdpbjogYXV0bzsKICB0ZXh0LWFsaWduOiBjZW50ZXI7CiAgbWFyZ2luLWJvdHRvbTogMjBweDsgLyogU3BhY2luZyBiZWxvdyB0aGUgYm94ICovCn0KYGBgCgoKQmVsb3cgd2Ugc2V0IHNvbWUgZ2xvYmFsIG9wdGlvbnMgZm9yIGFsbCBjb2RlIGNodW5rcyBpbiB0aGlzIGRvY3VtZW50LgoKCmBgYHtyfQojIFNldCBzZWVkIGZvciByZXByb2R1Y2liaWxpdHkKc2V0LnNlZWQoMTk4MikgCiMgU2V0IGdsb2JhbCBvcHRpb25zIGZvciBhbGwgY29kZSBjaHVua3MKa25pdHI6Om9wdHNfY2h1bmskc2V0KAogICMgRGlzYWJsZSBtZXNzYWdlcyBwcmludGVkIGJ5IFIgY29kZSBjaHVua3MKICBtZXNzYWdlID0gRkFMU0UsICAgIAogICMgRGlzYWJsZSB3YXJuaW5ncyBwcmludGVkIGJ5IFIgY29kZSBjaHVua3MKICB3YXJuaW5nID0gRkFMU0UsICAgIAogICMgU2hvdyBSIGNvZGUgd2l0aGluIGNvZGUgY2h1bmtzIGluIG91dHB1dAogIGVjaG8gPSBUUlVFLCAgICAgICAgCiAgIyBJbmNsdWRlIGJvdGggUiBjb2RlIGFuZCBpdHMgcmVzdWx0cyBpbiBvdXRwdXQKICBpbmNsdWRlID0gVFJVRSwgICAgIAogICMgRXZhbHVhdGUgUiBjb2RlIGNodW5rcwogIGV2YWwgPSBUUlVFLCAgICAgICAKICAjIEVuYWJsZSBjYWNoaW5nIG9mIFIgY29kZSBjaHVua3MgZm9yIGZhc3RlciByZW5kZXJpbmcKICBjYWNoZSA9IEZBTFNFLCAgICAgIAogICMgQWxpZ24gZmlndXJlcyBpbiB0aGUgY2VudGVyIG9mIHRoZSBvdXRwdXQKICBmaWcuYWxpZ24gPSAiY2VudGVyIiwKICAjIEVuYWJsZSByZXRpbmEgZGlzcGxheSBmb3IgaGlnaC1yZXNvbHV0aW9uIGZpZ3VyZXMKICByZXRpbmEgPSAyLAogICMgU2hvdyBlcnJvcnMgaW4gdGhlIG91dHB1dCBpbnN0ZWFkIG9mIHN0b3BwaW5nIHJlbmRlcmluZwogIGVycm9yID0gVFJVRSwKICAjIERvIG5vdCBjb2xsYXBzZSBjb2RlIGFuZCBvdXRwdXQgaW50byBhIHNpbmdsZSBibG9jawogIGNvbGxhcHNlID0gRkFMU0UKKQojIFN0YXJ0IHRoZSBmaWd1cmUgY291bnRlcgpmaWdfY291bnQgPC0gMAojIERlZmluZSB0aGUgY2FwdGlvbmVyIGZ1bmN0aW9uCmNhcHRpb25lciA8LSBmdW5jdGlvbihjYXB0aW9uKSB7CiAgZmlnX2NvdW50IDw8LSBmaWdfY291bnQgKyAxCiAgcGFzdGUwKCJGaWd1cmUgIiwgZmlnX2NvdW50LCAiOiAiLCBjYXB0aW9uKQp9CiMgRGVmaW5lIHRoZSBmdW5jdGlvbiB0byB0cnVuY2F0ZSBhIG51bWJlciB0byB0d28gZGVjaW1hbCBwbGFjZXMKdHJ1bmNhdGVfdG9fdHdvIDwtIGZ1bmN0aW9uKHgpIHsKICBmbG9vcih4ICogMTAwKSAvIDEwMAp9CmBgYAoKYGBge3J9CiMgTG9hZCByZXF1aXJlZCBsaWJyYXJpZXMKbGlicmFyeShodHRyKQpsaWJyYXJ5KGpzb25saXRlKQpsaWJyYXJ5KHJlYWRyKQpsaWJyYXJ5KGRwbHlyKQpsaWJyYXJ5KHpvbykgIyB0byB1c2UgbmEubG9jZgpsaWJyYXJ5KHRpZHlyKSAjIHRvIHVzZSBwaXZvdF93aWRlcgpsaWJyYXJ5KHNsYWNrcikKbGlicmFyeShncmF0ZWZ1bCkKbGlicmFyeShoZXJlKQoKaW5pdGlhbF9kYXRlIDwtIGFzLkRhdGUoIjIwMjUtMDQtMjQiKQp0b2RheSA8LSBTeXMuRGF0ZSgpCnNvdXJjZShoZXJlKCJrZXlzLlIiKSkKc2xhY2tyX3NldHVwKHRva2VuID0gdG9rZW4pCgojIEZ1bmN0aW9uIHRvIGZvcm1hdCBtYXJrZXQgY2FwIGluIG1pbGxpb25zIHdpdGggMSBkZWNpbWFsIGFuZCAiTSIgc3VmZml4CmZvcm1hdF9tYXJrZXRfY2FwIDwtIGZ1bmN0aW9uKHgpIHsKICBzYXBwbHkoeCwgZnVuY3Rpb24odmFsKSB7CiAgICBpZiAoaXMubmEodmFsKSkgewogICAgICByZXR1cm4oIk5BIikKICAgIH0KICAgIAogICAgdmFsIDwtIGFzLm51bWVyaWModmFsKQogICAgCiAgICBpZiAodmFsID49IDFlMTIpIHsKICAgICAgcmV0dXJuKHNwcmludGYoIiUuMWZUIiwgdmFsIC8gMWUxMikpCiAgICB9IGVsc2UgaWYgKHZhbCA+PSAxZTkpIHsKICAgICAgcmV0dXJuKHNwcmludGYoIiUuMWZCIiwgdmFsIC8gMWU5KSkKICAgIH0gZWxzZSBpZiAodmFsID49IDFlNikgewogICAgICByZXR1cm4oc3ByaW50ZigiJS4xZk0iLCB2YWwgLyAxZTYpKQogICAgfSBlbHNlIGlmICh2YWwgPj0gMWUzKSB7CiAgICAgIHJldHVybihzcHJpbnRmKCIlLjFmayIsIHZhbCAvIDFlMykpCiAgICB9IGVsc2UgewogICAgICByZXR1cm4oYXMuY2hhcmFjdGVyKHZhbCkpCiAgICB9CiAgfSkKfQpgYGAKCgpgYGB7cn0KIyAKIyAjIERlZmluZSB0aGUgQVBJIFVSTAojIHVybCA8LSAiaHR0cHM6Ly9hcGkubmFzZGFxLmNvbS9hcGkvc2NyZWVuZXIvc3RvY2tzP3RhYmxlb25seT10cnVlJmxpbWl0PTI1Jm9mZnNldD0wJmRvd25sb2FkPXRydWUiCiMgIyBTZXQgaGVhZGVycyB0byBtaW1pYyBhIGJyb3dzZXIKIyBoZWFkZXJzIDwtIGFkZF9oZWFkZXJzKGBVc2VyLUFnZW50YCA9ICJNb3ppbGxhLzUuMCIpCiMgIyBTZW5kIEdFVCByZXF1ZXN0CiMgcmVzcG9uc2UgPC0gR0VUKHVybCwgaGVhZGVycykKIyAjIENoZWNrIHN0YXR1cwojIGlmIChzdGF0dXNfY29kZShyZXNwb25zZSkgPT0gMjAwKSB7CiMgICAjIFBhcnNlIEpTT04gY29udGVudAojICAgY29udGVudF9qc29uIDwtIGNvbnRlbnQocmVzcG9uc2UsICJ0ZXh0IiwgZW5jb2RpbmcgPSAiVVRGLTgiKQojICAgZGF0YV9saXN0IDwtIGZyb21KU09OKGNvbnRlbnRfanNvbiwgZmxhdHRlbiA9IFRSVUUpCiMgCiMgICAjIEV4dHJhY3Qgcm93cyBmcm9tIEpTT04KIyAgIHN0b2NrX2RhdGEgPC0gZGF0YV9saXN0JGRhdGEkcm93cwojICAgIyBBZGQgY3VycmVudCBkYXRlIGNvbHVtbgojICAgc3RvY2tfZGF0YSRkYXRlIDwtIFN5cy5EYXRlKCkKIyAgICMgQ29udmVydCB0byBkYXRhIGZyYW1lIGFuZCBzYXZlIHRvIENTVgojICAgd3JpdGVfY3N2KHN0b2NrX2RhdGEsICJuYXNkYXFfc2NyZWVuZXIuY3N2IikKIyAgIGNhdCgi4pyFIERhdGEgc2F2ZWQgdG8gJ25hc2RhcV9zY3JlZW5lci5jc3YnXG4iKQojIH0gZWxzZSB7CiMgICBjYXQoIuKdjCBGYWlsZWQgdG8gZmV0Y2ggZGF0YS4gU3RhdHVzIGNvZGU6Iiwgc3RhdHVzX2NvZGUocmVzcG9uc2UpLCAiXG4iKQojIH0KCnRvZGF5X3N0b2NrX2RhdGEgPC0gcmVhZF9jc3YoaGVyZSgibmFzZGFxX3NjcmVlbmVyLmNzdiIpKSB8PgogIGZpbHRlcihuY2hhcihzeW1ib2wpPDUpIHw+ICMgZmlsdGVyIG91dCBzdG9ja3Mgd2l0aCBtb3JlIHRoYW4gNCBjaGFyYWN0ZXJzIChub3QgdHJhZGVhYmxlKQogIHNlbGVjdCgtbmFtZSwgLXVybCwgLW5ldGNoYW5nZSwgLXBjdGNoYW5nZSkgfD4gIyByZW1vdmUgdW5uZWNlc3NhcnkgY29sdW1ucwogIG11dGF0ZShsYXN0c2FsZSA9IGFzLm51bWVyaWMoZ3N1YigiWyQsXSIsICIiLCBsYXN0c2FsZSkpKSB8PiMgcmVtb3ZlICQgYW5kICwgZnJvbSBsYXN0c2FsZSBhbmQgbWFrZSBpdCBudW1lcmljCiAgc2VsZWN0KHN5bWJvbCwgZGF0ZSwgbGFzdHNhbGUsIGV2ZXJ5dGhpbmcoKSkgIyByZW9yZGVyIGNvbHVtbnMKCiMgUmVtb3ZlIHN5bWJvbHMgdGhhdCBhcmUgbm90IGxvbmdlciBiZWluZyB0cmFkZWQKY3VtbXVsYXRpdmVfc3RvY2tfZGF0YSA8LSByZWFkUkRTKGhlcmUoImN1bW11bGF0aXZlX3N0b2NrX2RhdGEuUkRTIikpIHw+CiAgZmlsdGVyKHN5bWJvbCAlaW4lIHRvZGF5X3N0b2NrX2RhdGEkc3ltYm9sKQoKIyBUaGUgZm9sbG93aW5nIHR3byBpbnN0cnVjdGlvbnMgZGVhbHMgd2l0aCBuZXdfZGF0YSBiZWluZyBhZGRlZCB3aGVuIGl0IGlzIGFscmVhZHkgdGhlcmUuCiMgVGhpcyBtaWdodCBoYXBwZW4gd2hlbiB0aGUgc3RvY2sgbWFya2V0IGlzIGNsb3NlZCBkdXJpbmcgd2Vla2RheXMKbmV3X2RhdGEgPC0gYW50aV9qb2luKHRvZGF5X3N0b2NrX2RhdGEsIAogICAgICAgICAgICAgICAgICAgICAgY3VtbXVsYXRpdmVfc3RvY2tfZGF0YSwgCiAgICAgICAgICAgICAgICAgICAgICBieSA9IGMoInN5bWJvbCIsICJkYXRlIikpCmNsZWFuX2N1bW11bGF0aXZlX3N0b2NrX2RhdGEgPC0gYmluZF9yb3dzKGN1bW11bGF0aXZlX3N0b2NrX2RhdGEsIG5ld19kYXRhKSB8PgogIGFycmFuZ2Uoc3ltYm9sLCBkYXRlKQoKIyBGaWxsIE5BIHZhbHVlcyBiYWNrd2FyZApzdG9ja19kYXRhX2ZpbGxlZCA8LSBjbGVhbl9jdW1tdWxhdGl2ZV9zdG9ja19kYXRhIHw+CiAgZ3JvdXBfYnkoc3ltYm9sKSB8PgogIGFycmFuZ2UoZGF0ZSwgLmJ5X2dyb3VwID0gVFJVRSkgfD4KICBtdXRhdGUobGFzdHNhbGUgPSBuYS5sb2NmKGxhc3RzYWxlLCBmcm9tTGFzdCA9IFRSVUUpKSB8PgogIHVuZ3JvdXAoKSB8PgogIGFycmFuZ2Uoc3ltYm9sLCBkYXRlKQoKIyBUaGUgZmlyc3QgZmlsdGVyIGVuc3VyZXMgdGhhdCB3ZSBvbmx5IGtlZXAgc3RvY2tzIHRoYXQgaGF2ZSBhIHBvc2l0aXZlIGdyb3d0aCB0cmVuZCAgCiMgVGhlIHNlY29uZCBmaWx0ZXIgZW5zdXJlcyB0aGF0IHRoZSBuZXh0IGRheSBwcmljZSBpcyBhdCBtb3N0IHR3aWNlIGFuZCBhdCBsZWFzdCA4MCUgb2YgdGhlIGxhc3QgcHJpY2UgKGZyb20gZGF5IHRvIGRheSBpdCBjYW4gb25seSBmYWxsIDIwJSkKc3RvY2tzX2RhdGFfZ3JvdyA8LSBzdG9ja19kYXRhX2ZpbGxlZCB8PgogIGdyb3VwX2J5KHN5bWJvbCkgfD4KICBhcnJhbmdlKGRhdGUsIC5ieV9ncm91cCA9IFRSVUUpIHw+CiAgZmlsdGVyKGZpcnN0KGxhc3RzYWxlKSA8PSBsYXN0KGxhc3RzYWxlKSkgfD4gIyBlbnN1cmUgcG9zaXRpdmUgZ3Jvd3RoIHRyZW5kCiAgZmlsdGVyKHsKICAgIG5leHRfYWRqIDwtIGxlYWQobGFzdHNhbGUpCiAgICBhbGwoKG5leHRfYWRqID4gMC44ICogbGFzdHNhbGUpICYgKG5leHRfYWRqIDwgMiAqIGxhc3RzYWxlKSwgbmEucm0gPSBUUlVFKQogIH0pIHw+CiAgdW5ncm91cCgpCgojIENvbXB1dGUgdGhlIHBlcmNlbnRhZ2UgY2hhbmdlIGZyb20gdGhlIHN0YXJ0IGRhdGUgCiMgS2VlcCBvbmx5IHRob3NlIHN0b2NrcyB3aGVyZSB0aGUgZmluYWwgcHJpY2UgZ3Jvd3RoIGlzIGF0IGxlYXN0IGhhbGYgb2YgdGhlIGhpZ2hlc3QgZ3Jvd3RoIChiZWZvcmUgdGhlIGVuZCkuCnN0b2NrX2RhdGFfcGN0X2NoYW5nZSA8LSBzdG9ja3NfZGF0YV9ncm93IHw+CiAgZ3JvdXBfYnkoc3ltYm9sKSB8PgogIGFycmFuZ2UoZGF0ZSwgLmJ5X2dyb3VwID0gVFJVRSkgfD4KICBtdXRhdGUoZGFpbHlfcGN0X2NoYW5nZSA9IChsYXN0c2FsZSAtIGxhZyhsYXN0c2FsZSkpIC8gbGFnKGxhc3RzYWxlKSAqIDEwMCwKICAgICAgICAgcGN0X2NoYW5nZSA9IChsYXN0c2FsZSAtIGZpcnN0KGxhc3RzYWxlKSkgLyBmaXJzdChsYXN0c2FsZSkgKiAxMDApIHw+CiAgZmlsdGVyKChtYXgoaGVhZChwY3RfY2hhbmdlLCAtMSkpIC8gMikgPD0gbGFzdChwY3RfY2hhbmdlKSkgfD4gIyBtYXh7Zmlyc3QsIC4uLiwgbGFzdC0xfSAvIDIgPD0gbGFzdAogIHVuZ3JvdXAoKSAKCiMgRmlsdGVyIHN5bWJvbHMgdGhhdCBoYXZlIGZhbGxlbiAoYW55dGltZSkgbW9yZSB0aGF0IHdoYXQgdGhleSBoYXZlIGdyb3duIChhdCB0aGUgZW5kKQpzeW1ib2xzX3dpdGhfbmVnYXRpdmVfcGN0X2NoYW5nZSA8LSBzdG9ja19kYXRhX3BjdF9jaGFuZ2UgfD4KICBncm91cF9ieShzeW1ib2wpIHw+CiAgYXJyYW5nZShkYXRlLCAuYnlfZ3JvdXAgPSBUUlVFKSB8PgogIGZpbHRlcihhbnkocGN0X2NoYW5nZSA8IDApKSB8PiAjIHRoaXMgZmlsdGVyIGlzIHNvIHRoYXQgdGhlIG5leHQgbWFrZSBzZW5zZQogIGZpbHRlcihhYnMobWluKHBjdF9jaGFuZ2UpKSA+IGxhc3QocGN0X2NoYW5nZSkpIHw+CiAgdW5ncm91cCgpIHw+CiAgZGlzdGluY3Qoc3ltYm9sKSB8PgogIHB1bGwoc3ltYm9sKQoKIyBGaWx0ZXIgb3V0IHRob3NlIHN5bWJvbHMgZnJvbSBzdG9ja19kYXRhX3BjdF9jaGFuZ2UKIyBUaGlzIGVuc3VyZXMgdGhhdCBoYXZlIGdyb3duIG1vcmUgdGhhdCB0aGV5IGhhdmUgZmFsbGVuCnN0b2NrX2RhdGFfcGN0X2NoYW5nZV90aGF0X2dyb3cgPC0gc3RvY2tfZGF0YV9wY3RfY2hhbmdlIHw+CiAgZmlsdGVyKCFzeW1ib2wgJWluJSBzeW1ib2xzX3dpdGhfbmVnYXRpdmVfcGN0X2NoYW5nZSkKCmF1eCA8LSBzdG9ja19kYXRhX3BjdF9jaGFuZ2VfdGhhdF9ncm93IHw+CiAgZmlsdGVyKGRhdGUgIT0gbWluKGRhdGUpKQoKCiMgRnJvbSBoZXJlIG9uIHRoZXJlIGFyZSBubyBtb3JlIGZpbHRlcnMKCgojIFRoZSBmb2xsb3dpbmcgY29udGFpbnMgdGhlIGluZm9ybWF0aW9uIG9mIHRoZSBzdXJ2aXZpbmcgc3ltYm9scwppbmZvX29mX3N1cnZpdmluZ19zeW1ib2xzIDwtIGF1eCB8PgogIGZpbHRlcihkYXRlID09IG1heChkYXRlKSkgfD4KICBzZWxlY3QoLWRhdGUsIC1sYXN0c2FsZSwgLWRhaWx5X3BjdF9jaGFuZ2UsIHBjdF9jaGFuZ2UpIHw+CiAgbXV0YXRlKG1hcmtldENhcF9mb3JtYXR0ZWQgPSBmb3JtYXRfbWFya2V0X2NhcChtYXJrZXRDYXApKQogIApjb3VudHJpZXMgPC0gaW5mb19vZl9zdXJ2aXZpbmdfc3ltYm9scyB8PgogIHNlbGVjdChjb3VudHJ5KSB8PgogIGRpc3RpbmN0KCkgfD4KICBhcnJhbmdlKGNvdW50cnkpIHw+CiAgcHVsbChjb3VudHJ5KQoKaW5kdXN0cmllcyA8LSBpbmZvX29mX3N1cnZpdmluZ19zeW1ib2xzIHw+CiAgc2VsZWN0KGluZHVzdHJ5KSB8PgogIGRpc3RpbmN0KCkgfD4KICBhcnJhbmdlKGluZHVzdHJ5KSB8PgogIHB1bGwoaW5kdXN0cnkpCgpzZWN0b3JzIDwtIGluZm9fb2Zfc3Vydml2aW5nX3N5bWJvbHMgfD4KICBzZWxlY3Qoc2VjdG9yKSB8PgogIGRpc3RpbmN0KCkgfD4KICBhcnJhbmdlKHNlY3RvcikgfD4KICBwdWxsKHNlY3RvcikKCiMgQ29tcHV0ZSB0aGUgcmFuayBmb3IgZWFjaCBkYXRlCmF1eF9yYW5rZWQgPC0gYXV4IHw+IAogIGdyb3VwX2J5KGRhdGUpIHw+CiAgYXJyYW5nZShwY3RfY2hhbmdlKSB8PgogIG11dGF0ZShyYW5rID0gcm93X251bWJlcigpKSB8PgogIHVuZ3JvdXAoKSB8PgogIGFycmFuZ2Uoc3ltYm9sLGRhdGUpCgojIENvbXB1dGUgbGFzdCBkYXkgcmFuawpsYXN0X2RheV9yYW5rIDwtIGF1eF9yYW5rZWQgfD4KICBncm91cF9ieShzeW1ib2wpIHw+CiAgZmlsdGVyKGRhdGUgPT0gbWF4KGRhdGUpKSB8PgogIHN1bW1hcmlzZShsYXN0X3JhbmsgPSByYW5rKSB8PgogIHVuZ3JvdXAoKSB8PgogIGFycmFuZ2UoZGVzYyhsYXN0X3JhbmspKQoKIyBDb21wdXRlIHRoZSBzdW0gb2YgcmFua3MgCnN1bV9yYW5rIDwtIGF1eF9yYW5rZWQgfD4KICBncm91cF9ieShzeW1ib2wpIHw+CiAgc3VtbWFyaXNlKHN1bV9yYW5rID0gc3VtKHJhbmspKSB8PgogIHVuZ3JvdXAoKSB8PgogIGFycmFuZ2UoZGVzYyhzdW1fcmFuaykpCgojIENyZWF0ZSB0aGUgdGFibGUgb2YgcmFua3MKdGFibGVfb2ZfcmFua3MgPC0gYXV4X3JhbmtlZCAlPiUKICBzZWxlY3Qoc3ltYm9sLCBkYXRlLCByYW5rKSAlPiUKICBwaXZvdF93aWRlcigKICAgIG5hbWVzX2Zyb20gPSBkYXRlLAogICAgdmFsdWVzX2Zyb20gPSByYW5rCiAgKQoKIyBhc3N1bWUgZmlyc3QgY29sdW1uIGlzICdzeW1ib2wnCnJhbmtpbmdfYWNjdW11bGF0ZWQgPC0gdGFibGVfb2ZfcmFua3MKCiMgR2V0IG9ubHkgdGhlIG51bWVyaWMgcGFydCAodGhlIHJhbmtzKQpyYW5rX21hdHJpeCA8LSBhcy5tYXRyaXgodGFibGVfb2ZfcmFua3NbLC0xXSkKCiMgQXBwbHkgdGhlIGN1c3RvbSBhY2N1bXVsYXRpb24gbG9naWMgcm93LXdpc2UKYWNjdW11bGF0ZWRfbWF0cml4IDwtIHQoYXBwbHkocmFua19tYXRyaXgsIDEsIGZ1bmN0aW9uKHJvdykgewogIGFjYyA8LSBudW1lcmljKGxlbmd0aChyb3cpKQogIGFjY1sxXSA8LSByb3dbMV0KICBmb3IgKGkgaW4gMjpsZW5ndGgocm93KSkgewogICAgaWYgKHJvd1tpXSA+PSByb3dbaSAtIDFdKSB7CiAgICAgIGFjY1tpXSA8LSBhY2NbaSAtIDFdICsgcm93W2ldCiAgICB9IGVsc2UgewogICAgICBhY2NbaV0gPC0gYWNjW2kgLSAxXSAtIHJvd1tpXQogICAgfQogIH0KICByZXR1cm4oYWNjKQp9KSkKCiMgQ29tYmluZSB3aXRoIHN5bWJvbHMgYWdhaW4KcmFua2luZ19hY2N1bXVsYXRlZFssLTFdIDwtIGFjY3VtdWxhdGVkX21hdHJpeAoKYWNjX3JhbmsgPC0gcmFua2luZ19hY2N1bXVsYXRlZFssIGMoMSxuY29sKHJhbmtpbmdfYWNjdW11bGF0ZWQpKV0gfD4gCiAgcmVuYW1lKGFjY19yYW5rID0gY29sbmFtZXMocmFua2luZ19hY2N1bXVsYXRlZClbbmNvbChyYW5raW5nX2FjY3VtdWxhdGVkKV0pIHw+CiAgYXJyYW5nZShkZXNjKGFjY19yYW5rKSkKCgojIEF1Z21lbnQgdGhlIHJhbmtzIHdpdGggaW5mbwphdWdfYWNjX3JhbmsgPC0gYWNjX3JhbmsgfD4KICBpbm5lcl9qb2luKGluZm9fb2Zfc3Vydml2aW5nX3N5bWJvbHMsIGJ5ID0gInN5bWJvbCIpIHw+CiAgYXJyYW5nZShkZXNjKGFjY19yYW5rKSkgfD4KICBzZWxlY3Qoc3ltYm9sLCBhY2NfcmFuaywgZXZlcnl0aGluZygpKQoKYXVnX3N1bV9yYW5rIDwtIHN1bV9yYW5rIHw+CiAgaW5uZXJfam9pbihpbmZvX29mX3N1cnZpdmluZ19zeW1ib2xzLCBieSA9ICJzeW1ib2wiKSB8PgogIGFycmFuZ2UoZGVzYyhzdW1fcmFuaykpIHw+CiAgc2VsZWN0KHN5bWJvbCwgc3VtX3JhbmssIGV2ZXJ5dGhpbmcoKSkKCmF1Z19sYXN0X2RheV9yYW5rIDwtIGxhc3RfZGF5X3JhbmsgfD4KICBpbm5lcl9qb2luKGluZm9fb2Zfc3Vydml2aW5nX3N5bWJvbHMsIGJ5ID0gInN5bWJvbCIpIHw+CiAgYXJyYW5nZShkZXNjKGxhc3RfcmFuaykpIHw+CiAgc2VsZWN0KHN5bWJvbCwgbGFzdF9yYW5rLCBldmVyeXRoaW5nKCkpCmBgYAoKCgpgYGB7cn0KY2l0ZV9wYWNrYWdlcyhvdXRwdXQgPSAicGFyYWdyYXBoIiwgb3V0LmRpciA9ICIuIikKYGBgCg==</div>
 
 
-
+</div>
+</div>
 
 </div>
 
@@ -300,14 +926,49 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("about.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
