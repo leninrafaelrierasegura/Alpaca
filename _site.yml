@@ -1,7 +1,7 @@
-name: "my-website"
+name: "Alpaca"
 output_dir: "docs"
 navbar:
-  title: "My Website"
+  title: "Alpaca"
   left:
     - text: "Home"
       href: index.html
@@ -9,3 +9,11 @@ navbar:
       href: about.html
     - text: "Info"
       href: info.html
+  right:
+    - icon: fa-github
+      #href: https://github.com/leninrafaelrierasegura/Alpaca
+output:
+  html_document:
+    highlight: textmate
+    theme: flatly
+    css: style.css

@@ -6,12 +6,12 @@ output:
     mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     highlight: pygments
     theme: flatly
-    code_folding: show # class.source = "fold-hide" to hide code and add a button to show it
-    # df_print: paged
-    toc: true
-    toc_float:
-      collapsed: true
-      smooth_scroll: true
+    code_folding: hide # class.source = "fold-hide" to hide code and add a button to show it
+    df_print: paged
+    # toc: true
+    # toc_float:
+    #   collapsed: true
+    #   smooth_scroll: true
     number_sections: false
     fig_caption: true
     code_download: true
@@ -73,13 +73,16 @@ pre {
 }
 ```
 
+<div style="color: blue;">
+********
+**Press the Show button below to reveal the code.**
 
-Below we set some global options for all code chunks in this document.
+********
+</div>
 
 
-```{r}
-# Set seed for reproducibility
-set.seed(1982) 
+
+```{r, echo= TRUE}
 # Set global options for all code chunks
 knitr::opts_chunk$set(
   # Disable messages printed by R code chunks
@@ -127,13 +130,13 @@ library(tidyr) # to use pivot_wider
 library(slackr)
 library(grateful)
 library(here)
+library(DT) 
 
 initial_date <- as.Date("2025-04-24")
 today <- Sys.Date()
 source(here("keys.R"))
 slackr_setup(token = token)
 
-# Function to format market cap in millions with 1 decimal and "M" suffix
 format_market_cap <- function(x) {
   sapply(x, function(val) {
     if (is.na(val)) {
@@ -185,7 +188,8 @@ format_market_cap <- function(x) {
 
 today_stock_data <- read_csv(here("nasdaq_screener.csv")) |>
   filter(nchar(symbol)<5) |> # filter out stocks with more than 4 characters (not tradeable)
-  select(-name, -url, -netchange, -pctchange) |> # remove unnecessary columns
+  filter(!grepl("\\^", symbol)) |> # remove symbols containing ^
+  select(-url, -netchange, -pctchange) |> # remove unnecessary columns
   mutate(lastsale = as.numeric(gsub("[$,]", "", lastsale))) |># remove $ and , from lastsale and make it numeric
   select(symbol, date, lastsale, everything()) # reorder columns
 
@@ -208,7 +212,10 @@ stock_data_filled <- clean_cummulative_stock_data |>
   mutate(lastsale = na.locf(lastsale, fromLast = TRUE)) |>
   ungroup() |>
   arrange(symbol, date)
+```
 
+
+```{r}
 # The first filter ensures that we only keep stocks that have a positive growth trend  
 # The second filter ensures that the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%)
 stocks_data_grow <- stock_data_filled |>
@@ -353,7 +360,108 @@ aug_last_day_rank <- last_day_rank |>
   select(symbol, last_rank, everything())
 ```
 
+***************
 
+# Accumulated Rank
+
+***************
+
+```{r}
+datatable(
+  aug_acc_rank,
+  filter = 'none',  # disable default text filters
+  options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    initComplete = JS(
+      "function(settings, json) {",
+      "  this.api().columns().every(function() {",
+      "    var column = this;",
+      "    var select = $('<select><option value=\"\"></option></select>')",
+      "      .appendTo($(column.header()).empty())",
+      "      .on('change', function() {",
+      "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
+      "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
+      "      });",
+      "    column.data().unique().sort().each(function(d, j) {",
+      "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
+      "    });",
+      "  });",
+      "}"
+    )
+  ),
+  escape = FALSE
+)
+```
+
+
+***************
+
+# Sum of Ranks
+
+***************
+
+```{r}
+datatable(
+  aug_sum_rank,
+  filter = 'none',  # disable default text filters
+  options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    initComplete = JS(
+      "function(settings, json) {",
+      "  this.api().columns().every(function() {",
+      "    var column = this;",
+      "    var select = $('<select><option value=\"\"></option></select>')",
+      "      .appendTo($(column.header()).empty())",
+      "      .on('change', function() {",
+      "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
+      "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
+      "      });",
+      "    column.data().unique().sort().each(function(d, j) {",
+      "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
+      "    });",
+      "  });",
+      "}"
+    )
+  ),
+  escape = FALSE
+)
+```
+
+***************
+
+# Last Day Rank
+
+***************
+
+```{r}
+datatable(
+  aug_last_day_rank,
+  filter = 'none',  # disable default text filters
+  options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    initComplete = JS(
+      "function(settings, json) {",
+      "  this.api().columns().every(function() {",
+      "    var column = this;",
+      "    var select = $('<select><option value=\"\"></option></select>')",
+      "      .appendTo($(column.header()).empty())",
+      "      .on('change', function() {",
+      "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
+      "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
+      "      });",
+      "    column.data().unique().sort().each(function(d, j) {",
+      "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
+      "    });",
+      "  });",
+      "}"
+    )
+  ),
+  escape = FALSE
+)
+```
 
 ```{r}
 cite_packages(output = "paragraph", out.dir = ".")
