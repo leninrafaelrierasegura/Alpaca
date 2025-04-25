@@ -348,20 +348,20 @@ acc_rank <- ranking_accumulated[, c(1,ncol(ranking_accumulated))] |>
 aug_acc_rank <- acc_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(acc_rank)) |>
-  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything()) |>
+  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume) |>
     mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 
 
 aug_sum_rank <- sum_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(sum_rank)) |>
-  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything()) |>
+  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume) |>
     mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 
 aug_last_day_rank <- last_day_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(last_rank)) |>
-  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything()) |>
+  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume) |>
     mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 ```
 
@@ -370,6 +370,7 @@ aug_last_day_rank <- last_day_rank |>
 # Accumulated Rank
 
 ***************
+
 
 
 ```{r}
@@ -381,32 +382,68 @@ datatable(
     autoWidth = TRUE,
     dom = 'lrtip',
     initComplete = JS(
-      "function(settings) {",
-      "  var api = this.api();",
-      "  // Create a new header row for the filters",
-      "  var header = $(api.table().header());",
-      "  var filterRow = $('<tr>').appendTo(header);",
-      "  api.columns().every(function() {",
-      "    var column = this;",
-      "    var cell = $('<th>').appendTo(filterRow);",
-      "    var select = $('<select><option value=\"\"></option></select>')",
-      "      .appendTo(cell)",
-      "      .on('change', function() {",
-      "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
-      "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
-      "      });",
-      "    column.data().unique().sort().each(function(d) {",
-      "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
-      "    });",
-      "  });",
-      "}"
-    )
+  "function(settings) {",
+  "  var api = this.api();",
+  "  var header = $(api.table().header());",
+  "  var filterRow = $('<tr>').appendTo(header);",
+
+  "  var colIndices = { country: 5, industry: 6, sector: 7, ipoyear: 8 };",
+  "  var industryToSector = {};",
+
+  "  // First pass: build industry-to-sector map",
+  "  var allData = api.rows().data();",
+  "  allData.each(function(row) {",
+  "    var industry = row[colIndices.industry];",
+  "    var sector = row[colIndices.sector];",
+  "    if (industry && sector) {",
+  "      industryToSector[industry] = sector;",
+  "    }",
+  "  });",
+
+  "  api.columns().every(function(index) {",
+  "    var column = this;",
+  "    var cell = $('<th>').appendTo(filterRow);",
+
+  "    if ([colIndices.country, colIndices.industry, colIndices.sector, colIndices.ipoyear].includes(index)) {",
+  "      var select = $('<select><option value=\"\"></option></select>')",
+  "        .appendTo(cell)",
+  "        .on('change', function() {",
+  "          var val = $.fn.dataTable.util.escapeRegex($(this).val());",
+  "          column.search(val ? '^' + val + '$' : '', true, false).draw();",
+
+  "          if (index === colIndices.sector) {",
+  "            var selectedSector = $(this).val();",
+  "            var industrySelect = filterRow.find('th').eq(colIndices.industry).find('select');",
+  "            industrySelect.val(''); // clear selection",
+  "            industrySelect.empty().append('<option value=\"\"></option>');",
+  "            var industries = Object.keys(industryToSector).filter(function(ind) {",
+  "              return selectedSector === '' || industryToSector[ind] === selectedSector;",
+  "            }).sort();",
+  "            industries.forEach(function(ind) {",
+  "              industrySelect.append('<option value=\"' + ind + '\">' + ind + '</option>');",
+  "            });",
+  "            // Also clear industry filter when sector is reset",
+  "            var industryColumn = api.column(colIndices.industry);",
+  "            industryColumn.search('', true, false).draw();",
+  "          }",
+  "        });",
+
+  "      column.data().unique().sort().each(function(d) {",
+  "        select.append('<option value=\"' + d + '\">' + d + '</option>');",
+  "      });",
+  "    } else {",
+  "      $(cell).html('');",
+  "    }",
+  "  });",
+  "}"
+)
+
   ),
   escape = FALSE,
   rownames = FALSE
 )
-```
 
+```
 
 
 ***************
@@ -424,30 +461,67 @@ datatable(
     autoWidth = TRUE,
     dom = 'lrtip',
     initComplete = JS(
-      "function(settings) {",
-      "  var api = this.api();",
-      "  // Create a new header row for the filters",
-      "  var header = $(api.table().header());",
-      "  var filterRow = $('<tr>').appendTo(header);",
-      "  api.columns().every(function() {",
-      "    var column = this;",
-      "    var cell = $('<th>').appendTo(filterRow);",
-      "    var select = $('<select><option value=\"\"></option></select>')",
-      "      .appendTo(cell)",
-      "      .on('change', function() {",
-      "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
-      "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
-      "      });",
-      "    column.data().unique().sort().each(function(d) {",
-      "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
-      "    });",
-      "  });",
-      "}"
-    )
+  "function(settings) {",
+  "  var api = this.api();",
+  "  var header = $(api.table().header());",
+  "  var filterRow = $('<tr>').appendTo(header);",
+
+  "  var colIndices = { country: 5, industry: 6, sector: 7, ipoyear: 8 };",
+  "  var industryToSector = {};",
+
+  "  // First pass: build industry-to-sector map",
+  "  var allData = api.rows().data();",
+  "  allData.each(function(row) {",
+  "    var industry = row[colIndices.industry];",
+  "    var sector = row[colIndices.sector];",
+  "    if (industry && sector) {",
+  "      industryToSector[industry] = sector;",
+  "    }",
+  "  });",
+
+  "  api.columns().every(function(index) {",
+  "    var column = this;",
+  "    var cell = $('<th>').appendTo(filterRow);",
+
+  "    if ([colIndices.country, colIndices.industry, colIndices.sector, colIndices.ipoyear].includes(index)) {",
+  "      var select = $('<select><option value=\"\"></option></select>')",
+  "        .appendTo(cell)",
+  "        .on('change', function() {",
+  "          var val = $.fn.dataTable.util.escapeRegex($(this).val());",
+  "          column.search(val ? '^' + val + '$' : '', true, false).draw();",
+
+  "          if (index === colIndices.sector) {",
+  "            var selectedSector = $(this).val();",
+  "            var industrySelect = filterRow.find('th').eq(colIndices.industry).find('select');",
+  "            industrySelect.val(''); // clear selection",
+  "            industrySelect.empty().append('<option value=\"\"></option>');",
+  "            var industries = Object.keys(industryToSector).filter(function(ind) {",
+  "              return selectedSector === '' || industryToSector[ind] === selectedSector;",
+  "            }).sort();",
+  "            industries.forEach(function(ind) {",
+  "              industrySelect.append('<option value=\"' + ind + '\">' + ind + '</option>');",
+  "            });",
+  "            // Also clear industry filter when sector is reset",
+  "            var industryColumn = api.column(colIndices.industry);",
+  "            industryColumn.search('', true, false).draw();",
+  "          }",
+  "        });",
+
+  "      column.data().unique().sort().each(function(d) {",
+  "        select.append('<option value=\"' + d + '\">' + d + '</option>');",
+  "      });",
+  "    } else {",
+  "      $(cell).html('');",
+  "    }",
+  "  });",
+  "}"
+)
+
   ),
   escape = FALSE,
   rownames = FALSE
 )
+
 ```
 
 ***************
@@ -465,30 +539,67 @@ datatable(
     autoWidth = TRUE,
     dom = 'lrtip',
     initComplete = JS(
-      "function(settings) {",
-      "  var api = this.api();",
-      "  // Create a new header row for the filters",
-      "  var header = $(api.table().header());",
-      "  var filterRow = $('<tr>').appendTo(header);",
-      "  api.columns().every(function() {",
-      "    var column = this;",
-      "    var cell = $('<th>').appendTo(filterRow);",
-      "    var select = $('<select><option value=\"\"></option></select>')",
-      "      .appendTo(cell)",
-      "      .on('change', function() {",
-      "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
-      "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
-      "      });",
-      "    column.data().unique().sort().each(function(d) {",
-      "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
-      "    });",
-      "  });",
-      "}"
-    )
+  "function(settings) {",
+  "  var api = this.api();",
+  "  var header = $(api.table().header());",
+  "  var filterRow = $('<tr>').appendTo(header);",
+
+  "  var colIndices = { country: 5, industry: 6, sector: 7, ipoyear: 8 };",
+  "  var industryToSector = {};",
+
+  "  // First pass: build industry-to-sector map",
+  "  var allData = api.rows().data();",
+  "  allData.each(function(row) {",
+  "    var industry = row[colIndices.industry];",
+  "    var sector = row[colIndices.sector];",
+  "    if (industry && sector) {",
+  "      industryToSector[industry] = sector;",
+  "    }",
+  "  });",
+
+  "  api.columns().every(function(index) {",
+  "    var column = this;",
+  "    var cell = $('<th>').appendTo(filterRow);",
+
+  "    if ([colIndices.country, colIndices.industry, colIndices.sector, colIndices.ipoyear].includes(index)) {",
+  "      var select = $('<select><option value=\"\"></option></select>')",
+  "        .appendTo(cell)",
+  "        .on('change', function() {",
+  "          var val = $.fn.dataTable.util.escapeRegex($(this).val());",
+  "          column.search(val ? '^' + val + '$' : '', true, false).draw();",
+
+  "          if (index === colIndices.sector) {",
+  "            var selectedSector = $(this).val();",
+  "            var industrySelect = filterRow.find('th').eq(colIndices.industry).find('select');",
+  "            industrySelect.val(''); // clear selection",
+  "            industrySelect.empty().append('<option value=\"\"></option>');",
+  "            var industries = Object.keys(industryToSector).filter(function(ind) {",
+  "              return selectedSector === '' || industryToSector[ind] === selectedSector;",
+  "            }).sort();",
+  "            industries.forEach(function(ind) {",
+  "              industrySelect.append('<option value=\"' + ind + '\">' + ind + '</option>');",
+  "            });",
+  "            // Also clear industry filter when sector is reset",
+  "            var industryColumn = api.column(colIndices.industry);",
+  "            industryColumn.search('', true, false).draw();",
+  "          }",
+  "        });",
+
+  "      column.data().unique().sort().each(function(d) {",
+  "        select.append('<option value=\"' + d + '\">' + d + '</option>');",
+  "      });",
+  "    } else {",
+  "      $(cell).html('');",
+  "    }",
+  "  });",
+  "}"
+)
+
   ),
   escape = FALSE,
   rownames = FALSE
 )
+
 ```
 
 ```{r}
