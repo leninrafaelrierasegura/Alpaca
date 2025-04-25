@@ -16,7 +16,7 @@ output:
     fig_caption: true
     code_download: true
 always_allow_html: true
-bibliography: 
+bibliography:
   - grateful-refs.bib
 header-includes:
   - \newcommand{\ar}{\mathbb{R}}
@@ -86,13 +86,13 @@ pre {
 # Set global options for all code chunks
 knitr::opts_chunk$set(
   # Disable messages printed by R code chunks
-  message = FALSE,    
+  message = FALSE,
   # Disable warnings printed by R code chunks
-  warning = FALSE,    
+  warning = FALSE,
   # Show R code within code chunks in output
-  echo = TRUE,        
+  echo = TRUE,
   # Include both R code and its results in output
-  include = TRUE,     
+  include = TRUE,
   # Evaluate R code chunks
   eval = TRUE,       
   # Enable caching of R code chunks for faster rendering

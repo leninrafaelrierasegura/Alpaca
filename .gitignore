@@ -4,5 +4,6 @@
 .Ruserdata
 keys.R
 cummulative_stock_data.RDS
-nasdaq_screener_24-04-2025.RDS
+nasdaq_screener_24-04-2025.csv
 nasdaq_screener.csv
+instructions.txt

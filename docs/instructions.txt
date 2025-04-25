@@ -1,7 +1,5 @@
-
-
-
 cd ~/Desktop/alpaca/AlpacaWebsite
 Rscript -e "rmarkdown::render_site(encoding = 'UTF-8')"
-
+git add .
+git commit -m "update website"
 
