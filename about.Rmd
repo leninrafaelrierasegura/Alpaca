@@ -1,3 +1,6 @@
-Welcome to Alpaca!
+---
+title: "Welcome to Alpaca!"
+output: html_document
+---
 
 Go to [rankings](https://leninrafaelrierasegura.github.io/Alpaca/info.html).

@@ -189,7 +189,7 @@ format_market_cap <- function(x) {
 today_stock_data <- read_csv(here("nasdaq_screener.csv")) |>
   filter(nchar(symbol)<5) |> # filter out stocks with more than 4 characters (not tradeable)
   filter(!grepl("\\^", symbol)) |> # remove symbols containing ^
-  select(-name, -url, -netchange, -pctchange) |> # remove unnecessary columns
+  select(-url, -netchange, -pctchange) |> # remove unnecessary columns
   mutate(lastsale = as.numeric(gsub("[$,]", "", lastsale))) |># remove $ and , from lastsale and make it numeric
   select(symbol, date, lastsale, everything()) # reorder columns
 
@@ -202,8 +202,10 @@ cummulative_stock_data <- readRDS(here("cummulative_stock_data.RDS")) |>
 new_data <- anti_join(today_stock_data, 
                       cummulative_stock_data, 
                       by = c("symbol", "date"))
+
 clean_cummulative_stock_data <- bind_rows(cummulative_stock_data, new_data) |>
-  arrange(symbol, date)
+  arrange(symbol, date) |>
+  select(symbol, date, lastsale, marketCap, country, industry, sector, ipoyear, volume, name)
 
 # Fill NA values backward
 stock_data_filled <- clean_cummulative_stock_data |>
@@ -348,20 +350,20 @@ acc_rank <- ranking_accumulated[, c(1,ncol(ranking_accumulated))] |>
 aug_acc_rank <- acc_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(acc_rank)) |>
-  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume) |>
+  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
     mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 
 
 aug_sum_rank <- sum_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(sum_rank)) |>
-  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume) |>
+  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
     mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 
 aug_last_day_rank <- last_day_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(last_rank)) |>
-  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume) |>
+  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
     mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 ```
 
@@ -373,7 +375,7 @@ aug_last_day_rank <- last_day_rank |>
 
 
 
-```{r}
+```{r results='asis'}
 datatable(
   aug_acc_rank,
   filter = 'none',
@@ -440,7 +442,8 @@ datatable(
 
   ),
   escape = FALSE,
-  rownames = FALSE
+  rownames = FALSE,
+  class = "display nowrap"  # Apply no-wrap class here to prevent wrapping of text in cells
 )
 
 ```
@@ -519,7 +522,8 @@ datatable(
 
   ),
   escape = FALSE,
-  rownames = FALSE
+  rownames = FALSE,
+  class = "display nowrap"  # Apply no-wrap class here to prevent wrapping of text in cells
 )
 
 ```
@@ -597,10 +601,16 @@ datatable(
 
   ),
   escape = FALSE,
-  rownames = FALSE
+  rownames = FALSE,
+  class = "display nowrap"  # Apply no-wrap class here to prevent wrapping of text in cells
 )
 
 ```
+
+```{r}
+print("All good maybe")
+```
+
 
 ```{r}
 cite_packages(output = "paragraph", out.dir = ".")
