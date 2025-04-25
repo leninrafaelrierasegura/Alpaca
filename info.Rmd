@@ -349,19 +349,20 @@ aug_acc_rank <- acc_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(acc_rank)) |>
   select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything()) |>
-  mutate(link = paste0("https://finance.yahoo.com/quote/", symbol))
+    mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
+
 
 aug_sum_rank <- sum_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(sum_rank)) |>
   select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything()) |>
-  mutate(link = paste0("https://finance.yahoo.com/quote/", symbol))
+    mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 
 aug_last_day_rank <- last_day_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(last_rank)) |>
   select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything()) |>
-  mutate(link = paste0("https://finance.yahoo.com/quote/", symbol))
+    mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
 ```
 
 ***************
