@@ -1,0 +1,1 @@
+Go to [rankings](https://leninrafaelrierasegura.github.io/Alpaca/info.html).

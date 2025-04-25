@@ -7,11 +7,11 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
-    - text: "Info"
+    - text: "Rankings"
       href: info.html
   right:
     - icon: fa-github
-      #href: https://github.com/leninrafaelrierasegura/Alpaca
+      href: https://github.com/leninrafaelrierasegura/Alpaca
 output:
   html_document:
     highlight: textmate
