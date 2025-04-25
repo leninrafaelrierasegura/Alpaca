@@ -608,7 +608,7 @@ datatable(
 ```
 
 ```{r}
-print("All good maybe")
+print("All absolutely good")
 ```
 
 
