@@ -189,7 +189,7 @@ format_market_cap <- function(x) {
 today_stock_data <- read_csv(here("nasdaq_screener.csv")) |>
   filter(nchar(symbol)<5) |> # filter out stocks with more than 4 characters (not tradeable)
   filter(!grepl("\\^", symbol)) |> # remove symbols containing ^
-  select(-url, -netchange, -pctchange) |> # remove unnecessary columns
+  select(-name, -url, -netchange, -pctchange) |> # remove unnecessary columns
   mutate(lastsale = as.numeric(gsub("[$,]", "", lastsale))) |># remove $ and , from lastsale and make it numeric
   select(symbol, date, lastsale, everything()) # reorder columns
 
@@ -234,16 +234,16 @@ stock_data_pct_change <- stocks_data_grow |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
   mutate(daily_pct_change = (lastsale - lag(lastsale)) / lag(lastsale) * 100,
-         pct_change = (lastsale - first(lastsale)) / first(lastsale) * 100) |>
-  filter((max(head(pct_change, -1)) / 2) <= last(pct_change)) |> # max{first, ..., last-1} / 2 <= last
+         accum_pct_change = (lastsale - first(lastsale)) / first(lastsale) * 100) |>
+  filter((max(head(accum_pct_change, -1)) / 2) <= last(accum_pct_change)) |> # max{first, ..., last-1} / 2 <= last
   ungroup() 
 
 # Filter symbols that have fallen (anytime) more that what they have grown (at the end)
 symbols_with_negative_pct_change <- stock_data_pct_change |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
-  filter(any(pct_change < 0)) |> # this filter is so that the next make sense
-  filter(abs(min(pct_change)) > last(pct_change)) |>
+  filter(any(accum_pct_change < 0)) |> # this filter is so that the next make sense
+  filter(abs(min(accum_pct_change)) > last(accum_pct_change)) |>
   ungroup() |>
   distinct(symbol) |>
   pull(symbol)
@@ -263,8 +263,9 @@ aux <- stock_data_pct_change_that_grow |>
 # The following contains the information of the surviving symbols
 info_of_surviving_symbols <- aux |>
   filter(date == max(date)) |>
-  select(-date, -lastsale, -daily_pct_change, pct_change) |>
-  mutate(marketCap_formatted = format_market_cap(marketCap))
+  select(-date, -lastsale, -daily_pct_change) |>
+  mutate(marketCap_ = format_market_cap(marketCap),
+         accum_pct_change = round(accum_pct_change, 2))
   
 countries <- info_of_surviving_symbols |>
   select(country) |>
@@ -287,7 +288,7 @@ sectors <- info_of_surviving_symbols |>
 # Compute the rank for each date
 aux_ranked <- aux |> 
   group_by(date) |>
-  arrange(pct_change) |>
+  arrange(accum_pct_change) |>
   mutate(rank = row_number()) |>
   ungroup() |>
   arrange(symbol,date)
@@ -347,17 +348,17 @@ acc_rank <- ranking_accumulated[, c(1,ncol(ranking_accumulated))] |>
 aug_acc_rank <- acc_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(acc_rank)) |>
-  select(symbol, acc_rank, everything())
+  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything())
 
 aug_sum_rank <- sum_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(sum_rank)) |>
-  select(symbol, sum_rank, everything())
+  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything())
 
 aug_last_day_rank <- last_day_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(last_rank)) |>
-  select(symbol, last_rank, everything())
+  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, everything())
 ```
 
 ***************
@@ -366,33 +367,42 @@ aug_last_day_rank <- last_day_rank |>
 
 ***************
 
+
 ```{r}
 datatable(
   aug_acc_rank,
-  filter = 'none',  # disable default text filters
+  filter = 'none',
   options = list(
     pageLength = 10,
     autoWidth = TRUE,
+    dom = 'lrtip',
     initComplete = JS(
-      "function(settings, json) {",
-      "  this.api().columns().every(function() {",
+      "function(settings) {",
+      "  var api = this.api();",
+      "  // Create a new header row for the filters",
+      "  var header = $(api.table().header());",
+      "  var filterRow = $('<tr>').appendTo(header);",
+      "  api.columns().every(function() {",
       "    var column = this;",
+      "    var cell = $('<th>').appendTo(filterRow);",
       "    var select = $('<select><option value=\"\"></option></select>')",
-      "      .appendTo($(column.header()).empty())",
+      "      .appendTo(cell)",
       "      .on('change', function() {",
       "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
       "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
       "      });",
-      "    column.data().unique().sort().each(function(d, j) {",
+      "    column.data().unique().sort().each(function(d) {",
       "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
       "    });",
       "  });",
       "}"
     )
   ),
-  escape = FALSE
+  escape = FALSE,
+  rownames = FALSE
 )
 ```
+
 
 
 ***************
@@ -404,28 +414,35 @@ datatable(
 ```{r}
 datatable(
   aug_sum_rank,
-  filter = 'none',  # disable default text filters
+  filter = 'none',
   options = list(
     pageLength = 10,
     autoWidth = TRUE,
+    dom = 'lrtip',
     initComplete = JS(
-      "function(settings, json) {",
-      "  this.api().columns().every(function() {",
+      "function(settings) {",
+      "  var api = this.api();",
+      "  // Create a new header row for the filters",
+      "  var header = $(api.table().header());",
+      "  var filterRow = $('<tr>').appendTo(header);",
+      "  api.columns().every(function() {",
       "    var column = this;",
+      "    var cell = $('<th>').appendTo(filterRow);",
       "    var select = $('<select><option value=\"\"></option></select>')",
-      "      .appendTo($(column.header()).empty())",
+      "      .appendTo(cell)",
       "      .on('change', function() {",
       "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
       "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
       "      });",
-      "    column.data().unique().sort().each(function(d, j) {",
+      "    column.data().unique().sort().each(function(d) {",
       "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
       "    });",
       "  });",
       "}"
     )
   ),
-  escape = FALSE
+  escape = FALSE,
+  rownames = FALSE
 )
 ```
 
@@ -438,28 +455,35 @@ datatable(
 ```{r}
 datatable(
   aug_last_day_rank,
-  filter = 'none',  # disable default text filters
+  filter = 'none',
   options = list(
     pageLength = 10,
     autoWidth = TRUE,
+    dom = 'lrtip',
     initComplete = JS(
-      "function(settings, json) {",
-      "  this.api().columns().every(function() {",
+      "function(settings) {",
+      "  var api = this.api();",
+      "  // Create a new header row for the filters",
+      "  var header = $(api.table().header());",
+      "  var filterRow = $('<tr>').appendTo(header);",
+      "  api.columns().every(function() {",
       "    var column = this;",
+      "    var cell = $('<th>').appendTo(filterRow);",
       "    var select = $('<select><option value=\"\"></option></select>')",
-      "      .appendTo($(column.header()).empty())",
+      "      .appendTo(cell)",
       "      .on('change', function() {",
       "        var val = $.fn.dataTable.util.escapeRegex($(this).val());",
       "        column.search(val ? '^' + val + '$' : '', true, false).draw();",
       "      });",
-      "    column.data().unique().sort().each(function(d, j) {",
+      "    column.data().unique().sort().each(function(d) {",
       "      select.append('<option value=\"' + d + '\">' + d + '</option>');",
       "    });",
       "  });",
       "}"
     )
   ),
-  escape = FALSE
+  escape = FALSE,
+  rownames = FALSE
 )
 ```
 
