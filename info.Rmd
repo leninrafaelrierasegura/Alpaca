@@ -132,7 +132,7 @@ library(grateful)
 library(here)
 library(DT) 
 
-initial_date <- as.Date("2025-04-24")
+initial_date <- as.Date("2025-04-23")
 today <- Sys.Date()
 source(here("keys.R"))
 slackr_setup(token = token)
@@ -160,11 +160,15 @@ format_market_cap <- function(x) {
 }
 ```
 
-Data is downloaded daily from [here](https://www.nasdaq.com/market-activity/stocks/screener).
+Data is downloaded daily from [here](https://www.nasdaq.com/market-activity/stocks/screener). The `lastsale` value reported in the previous link is the open price when the market closes, according to this [website](https://finance.yahoo.com/).
+
+Data collection started on April 23, 2025.
+
+This code runs daily. So it may happen that the same data is retrieved on both Saturday and Sunday (the data from Friday). So the column `date` is ignored here `distinct(across(-date), .keep_all = TRUE)` because it may be different just because the same data was retrieved in different dates.
 
 ```{r}
-# 
-# # Define the API URL
+
+# Define the API URL
 # url <- "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true"
 # # Set headers to mimic a browser
 # headers <- add_headers(`User-Agent` = "Mozilla/5.0")
@@ -181,13 +185,13 @@ Data is downloaded daily from [here](https://www.nasdaq.com/market-activity/stoc
 #   # Add current date column
 #   stock_data$date <- Sys.Date()
 #   # Convert to data frame and save to CSV
-#   write_csv(stock_data, "nasdaq_screener.csv")
-#   cat("✅ Data saved to 'nasdaq_screener.csv'\n")
+#   write_csv(stock_data, here("data/nasdaq_screener.csv"))
+#   cat("✅ Data saved to 'data/nasdaq_screener.csv'\n")
 # } else {
 #   cat("❌ Failed to fetch data. Status code:", status_code(response), "\n")
 # }
 
-today_stock_data <- read_csv(here("nasdaq_screener.csv")) |>
+today_stock_data <- read_csv(here("data/nasdaq_screener_24-04-2025.csv")) |>
   filter(nchar(symbol)<5) |> # filter out stocks with more than 4 characters (not tradeable)
   filter(!grepl("\\^", symbol)) |> # remove symbols containing ^
   select(-url, -netchange, -pctchange) |> # remove unnecessary columns
@@ -195,26 +199,40 @@ today_stock_data <- read_csv(here("nasdaq_screener.csv")) |>
   select(symbol, date, lastsale, everything()) # reorder columns
 
 # Remove symbols that are not longer being traded
-cummulative_stock_data <- readRDS(here("cummulative_stock_data.RDS")) |>
+cummulative_stock_data <- readRDS(here("data/cummulative_stock_data.RDS")) |>
   filter(symbol %in% today_stock_data$symbol)
 
 # The following two instructions deals with new_data being added when it is already there.
 # This might happen when the stock market is closed during weekdays
-new_data <- anti_join(today_stock_data, 
-                      cummulative_stock_data, 
-                      by = c("symbol", "date"))
-
-clean_cummulative_stock_data <- bind_rows(cummulative_stock_data, new_data) |>
+clean_cummulative_stock_data <- bind_rows(cummulative_stock_data, today_stock_data) |>
+  distinct(across(-date), .keep_all = TRUE) |> # remove duplicates
   arrange(symbol, date) |>
   select(symbol, date, lastsale, marketCap, country, industry, sector, ipoyear, volume, name)
 
-# Fill NA values backward
-stock_data_filled <- clean_cummulative_stock_data |>
-  group_by(symbol) |>
-  arrange(date, .by_group = TRUE) |>
-  mutate(lastsale = na.locf(lastsale, fromLast = TRUE)) |>
-  ungroup() |>
+# Get unique dates from the dataset
+unique_dates <- sort(unique(clean_cummulative_stock_data$date))
+
+# Step 1: Expand each symbol to all existing dates
+stock_data_expanded <- clean_cummulative_stock_data %>%
+  group_by(symbol) %>%
+  complete(date = unique_dates) %>%
+  ungroup()
+
+# Step 2: Fill backward for multiple columns
+columns_to_fill <- c(
+  "lastsale", "marketCap", "country", "industry", 
+  "sector", "ipoyear", "volume", "name"
+)
+
+stock_data_filled <- stock_data_expanded %>%
+  group_by(symbol) %>%
+  arrange(date, .by_group = TRUE) %>%
+  mutate(across(all_of(columns_to_fill),
+                ~ zoo::na.locf(.x, fromLast = TRUE, na.rm = FALSE))) %>%
+  ungroup() %>%
   arrange(symbol, date)
+
+# saveRDS(stock_data_filled, here("data/cummulative_stock_data.RDS"))
 ```
 
 
