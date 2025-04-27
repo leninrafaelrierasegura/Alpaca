@@ -166,6 +166,8 @@ Data collection started on April 23, 2025.
 
 This code runs daily. So it may happen that the same data is retrieved on both Saturday and Sunday (the data from Friday). So the column `date` is ignored here `distinct(across(-date), .keep_all = TRUE)` because it may be different just because the same data was retrieved in different dates.
 
+Column `entrynumver` is added to keep track of the number of entries for each symbol. It is there to avoid removing rows that were NA-backfilled.
+
 ```{r}
 
 # Define the API URL
@@ -213,9 +215,9 @@ clean_cummulative_stock_data <- bind_rows(cummulative_stock_data, today_stock_da
 unique_dates <- sort(unique(clean_cummulative_stock_data$date))
 
 # Step 1: Expand each symbol to all existing dates
-stock_data_expanded <- clean_cummulative_stock_data %>%
-  group_by(symbol) %>%
-  complete(date = unique_dates) %>%
+stock_data_expanded <- clean_cummulative_stock_data |>
+  group_by(symbol) |>
+  complete(date = unique_dates) |>
   ungroup()
 
 # Step 2: Fill backward for multiple columns
@@ -224,22 +226,29 @@ columns_to_fill <- c(
   "sector", "ipoyear", "volume", "name"
 )
 
-stock_data_filled <- stock_data_expanded %>%
-  group_by(symbol) %>%
-  arrange(date, .by_group = TRUE) %>%
+stock_data_filled <- stock_data_expanded |>
+  group_by(symbol) |>
+  arrange(date, .by_group = TRUE) |>
   mutate(across(all_of(columns_to_fill),
-                ~ zoo::na.locf(.x, fromLast = TRUE, na.rm = FALSE))) %>%
-  ungroup() %>%
+                ~ zoo::na.locf(.x, fromLast = TRUE, na.rm = FALSE))) |>
+  ungroup() |>
   arrange(symbol, date)
 
-# saveRDS(stock_data_filled, here("data/cummulative_stock_data.RDS"))
+stock_data_to_save <- stock_data_filled |>
+  group_by(symbol) |>
+  arrange(date, .by_group = TRUE) |>
+  mutate(entrynumber = row_number())
+  
+
+# saveRDS(stock_data_to_save, here("data/cummulative_stock_data.RDS"))
 ```
 
 
 ```{r}
 # The first filter ensures that we only keep stocks that have a positive growth trend  
 # The second filter ensures that the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%)
-stocks_data_grow <- stock_data_filled |>
+stocks_data_grow <- stock_data_to_save |>
+  select(-entrynumber) |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
   filter(first(lastsale) <= last(lastsale)) |> # ensure positive growth trend
@@ -330,8 +339,8 @@ sum_rank <- aux_ranked |>
   arrange(desc(sum_rank))
 
 # Create the table of ranks
-table_of_ranks <- aux_ranked %>%
-  select(symbol, date, rank) %>%
+table_of_ranks <- aux_ranked |>
+  select(symbol, date, rank) |>
   pivot_wider(
     names_from = date,
     values_from = rank
@@ -627,8 +636,11 @@ datatable(
 ```
 
 ```{r}
-print("It will automatically execute!")
-format(Sys.time(), "%H:%M:%S")
+print(paste("This was executed on:", Sys.time()))
+slackr_msg(
+  text = "New update at <https://leninrafaelrierasegura.github.io/Alpaca/info.html>",
+  channel = "#ranks"
+)
 ```
 
 
