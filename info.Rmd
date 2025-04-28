@@ -166,39 +166,45 @@ Data collection started on April 23, 2025.
 This code runs daily. So it may happen that the same data is retrieved on both Saturday and Sunday (the data from Friday). So the column `date` is ignored here `distinct(across(-date), .keep_all = TRUE)` because it may be different just because the same data was retrieved in different dates.
 
 ```{r}
-# today <- Sys.Date()
-# # Define the API URL
-# url <- "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true"
-# # Set headers to mimic a browser
-# headers <- add_headers(`User-Agent` = "Mozilla/5.0")
-# # Send GET request
-# response <- GET(url, headers)
-# # Check status
-# if (status_code(response) == 200) {
-#   # Parse JSON content
-#   content_json <- content(response, "text", encoding = "UTF-8")
-#   data_list <- fromJSON(content_json, flatten = TRUE)
-# 
-#   # Extract rows from JSON
-#   stock_data <- data_list$data$rows
-#   # Add current date column
-#   stock_data$date <- today
-#   
-#   # Create filename with today's date
-#   file_name <- paste0("nasdaq_screener_", today, ".csv")
-#   
-#   # Save to CSV
-#   write_csv(stock_data, here("data", file_name))
-#   cat("✅ Data saved to", file_name, "\n")
-# } else {
-#   cat("❌ Failed to fetch data. Status code:", status_code(response), "\n")
-# }
+aux_day <- Sys.Date()
+day_of_week <- weekdays(aux_day)
+
+if (day_of_week == "Monday") {
+  today <- aux_day - 3
+} else if (day_of_week %in% c("Tuesday", "Wednesday", "Thursday", "Friday")) {
+  today <- aux_day - 1
+} else {
+  today <- aux_day  # or handle Saturday/Sunday however you want
+}
+# Define the API URL
+url <- "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true"
+# Set headers to mimic a browser
+headers <- add_headers(`User-Agent` = "Mozilla/5.0")
+# Send GET request
+response <- GET(url, headers)
+# Check status
+if (status_code(response) == 200) {
+  # Parse JSON content
+  content_json <- content(response, "text", encoding = "UTF-8")
+  data_list <- fromJSON(content_json, flatten = TRUE)
+
+  # Extract rows from JSON
+  stock_data <- data_list$data$rows
+  # Add current date column
+  stock_data$date <- today
+
+  # Create filename with today's date
+  file_name <- paste0("nasdaq_screener_", today, ".csv")
+
+  # Save to CSV
+  write_csv(stock_data, here("data", file_name))
+  cat("✅ Data saved to", file_name, "\n")
+} else {
+  cat("❌ Failed to fetch data. Status code:", status_code(response), "\n")
+}
 
 # The following line should replace the next following line
-# today_stock_data <- read_csv(here("data", file_name)) |> 
-
-
-today_stock_data <- read_csv(here("data/nasdaq_screener_2025-04-24.csv")) |>
+today_stock_data <- read_csv(here("data", file_name))  |>
   filter(nchar(symbol)<5) |> # filter out stocks with more than 4 characters (not tradeable)
   filter(!grepl("\\^", symbol)) |> # remove symbols containing ^
   select(-url, -netchange, -pctchange) |> # remove unnecessary columns
@@ -240,16 +246,20 @@ stock_data_filled <- stock_data_expanded |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
   mutate(across(all_of(columns_to_fill),
-                ~ zoo::na.locf(.x, fromLast = TRUE, na.rm = FALSE))) |>
+                ~ zoo::na.locf(.x, fromLast = TRUE, na.rm = FALSE))) |> # filling from the last available value backward
+  mutate(across(all_of(columns_to_fill),
+                ~ zoo::na.locf(.x, fromLast = FALSE, na.rm = FALSE))) |> # filling from the first available value forward
   ungroup() |>
   arrange(symbol, date)
 
 stock_data_to_save <- stock_data_filled |>
   group_by(symbol) |>
-  arrange(date, .by_group = TRUE)
-  
+  arrange(date, .by_group = TRUE) |>
+  filter(!any(is.na(lastsale))) |>
+  ungroup() |>
+  arrange(symbol, date)
 
-# saveRDS(stock_data_to_save, here("data/cummulative_stock_data.RDS"))
+saveRDS(stock_data_to_save, here("data/cummulative_stock_data.RDS"))
 ```
 
 
