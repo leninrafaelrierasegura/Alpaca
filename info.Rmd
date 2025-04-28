@@ -133,7 +133,6 @@ library(here)
 library(DT) 
 
 initial_date <- as.Date("2025-04-23")
-today <- Sys.Date()
 source(here("keys.R"))
 slackr_setup(token = token)
 
@@ -166,11 +165,9 @@ Data collection started on April 23, 2025.
 
 This code runs daily. So it may happen that the same data is retrieved on both Saturday and Sunday (the data from Friday). So the column `date` is ignored here `distinct(across(-date), .keep_all = TRUE)` because it may be different just because the same data was retrieved in different dates.
 
-Column `entrynumver` is added to keep track of the number of entries for each symbol. It is there to avoid removing rows that were NA-backfilled.
-
 ```{r}
-
-# Define the API URL
+# today <- Sys.Date()
+# # Define the API URL
 # url <- "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true"
 # # Set headers to mimic a browser
 # headers <- add_headers(`User-Agent` = "Mozilla/5.0")
@@ -185,15 +182,23 @@ Column `entrynumver` is added to keep track of the number of entries for each sy
 #   # Extract rows from JSON
 #   stock_data <- data_list$data$rows
 #   # Add current date column
-#   stock_data$date <- Sys.Date()
-#   # Convert to data frame and save to CSV
-#   write_csv(stock_data, here("data/nasdaq_screener.csv"))
-#   cat("✅ Data saved to 'data/nasdaq_screener.csv'\n")
+#   stock_data$date <- today
+#   
+#   # Create filename with today's date
+#   file_name <- paste0("nasdaq_screener_", today, ".csv")
+#   
+#   # Save to CSV
+#   write_csv(stock_data, here("data", file_name))
+#   cat("✅ Data saved to", file_name, "\n")
 # } else {
 #   cat("❌ Failed to fetch data. Status code:", status_code(response), "\n")
 # }
 
-today_stock_data <- read_csv(here("data/nasdaq_screener_24-04-2025.csv")) |>
+# The following line should replace the next following line
+# today_stock_data <- read_csv(here("data", file_name)) |> 
+
+
+today_stock_data <- read_csv(here("data/nasdaq_screener_2025-04-24.csv")) |>
   filter(nchar(symbol)<5) |> # filter out stocks with more than 4 characters (not tradeable)
   filter(!grepl("\\^", symbol)) |> # remove symbols containing ^
   select(-url, -netchange, -pctchange) |> # remove unnecessary columns
@@ -206,8 +211,13 @@ cummulative_stock_data <- readRDS(here("data/cummulative_stock_data.RDS")) |>
 
 # The following two instructions deals with new_data being added when it is already there.
 # This might happen when the stock market is closed during weekdays
-clean_cummulative_stock_data <- bind_rows(cummulative_stock_data, today_stock_data) |>
-  distinct(across(-date), .keep_all = TRUE) |> # remove duplicates
+
+# Keep only rows from today_stock_data that are NOT already in cummulative_stock_data
+new_today_stock_data <- anti_join(today_stock_data, 
+                                  cummulative_stock_data, 
+                                  by = setdiff(names(today_stock_data), "date")) # Identify columns to match (everything except 'date')
+
+clean_cummulative_stock_data <- bind_rows(cummulative_stock_data, new_today_stock_data) |>
   arrange(symbol, date) |>
   select(symbol, date, lastsale, marketCap, country, industry, sector, ipoyear, volume, name)
 
@@ -236,8 +246,7 @@ stock_data_filled <- stock_data_expanded |>
 
 stock_data_to_save <- stock_data_filled |>
   group_by(symbol) |>
-  arrange(date, .by_group = TRUE) |>
-  mutate(entrynumber = row_number())
+  arrange(date, .by_group = TRUE)
   
 
 # saveRDS(stock_data_to_save, here("data/cummulative_stock_data.RDS"))
@@ -248,7 +257,6 @@ stock_data_to_save <- stock_data_filled |>
 # The first filter ensures that we only keep stocks that have a positive growth trend  
 # The second filter ensures that the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%)
 stocks_data_grow <- stock_data_to_save |>
-  select(-entrynumber) |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
   filter(first(lastsale) <= last(lastsale)) |> # ensure positive growth trend
