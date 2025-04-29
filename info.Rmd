@@ -264,6 +264,7 @@ saveRDS(stock_data_to_save, here("data/cummulative_stock_data.RDS"))
 
 
 ```{r}
+# stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS")) 
 # The first filter ensures that we only keep stocks that have a positive growth trend  
 # The second filter ensures that the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%)
 stocks_data_grow <- stock_data_to_save |>
@@ -397,20 +398,26 @@ aug_acc_rank <- acc_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(acc_rank)) |>
   select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
-    mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
+  mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
+  mutate(rank = row_number()) |>
+  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
 
 
 aug_sum_rank <- sum_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(sum_rank)) |>
   select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
-    mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
+  mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
+  mutate(rank = row_number()) |>
+  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
 
 aug_last_day_rank <- last_day_rank |>
   inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(last_rank)) |>
   select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
-    mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>"))
+  mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
+  mutate(rank = row_number()) |>
+  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
 ```
 
 ***************
@@ -479,20 +486,29 @@ datatable(
   "      column.data().unique().sort().each(function(d) {",
   "        select.append('<option value=\"' + d + '\">' + d + '</option>');",
   "      });",
+  "    } else if (index === 0) {",
+  "      // Add text input for symbol search",
+  "      $('<input type=\"text\" placeholder=\"Search symbol\" style=\"width: 100%;\">')",
+  "        .appendTo(cell)",
+  "        .on('keyup change', function() {",
+  "          var val = $(this).val();",
+  "          column.search(val).draw();",
+  "        });",
   "    } else {",
   "      $(cell).html('');",
   "    }",
   "  });",
   "}"
 )
-
   ),
   escape = FALSE,
   rownames = FALSE,
-  class = "display nowrap"  # Apply no-wrap class here to prevent wrapping of text in cells
+  class = "display nowrap"
 )
 
+
 ```
+
 
 
 ***************
@@ -559,18 +575,26 @@ datatable(
   "      column.data().unique().sort().each(function(d) {",
   "        select.append('<option value=\"' + d + '\">' + d + '</option>');",
   "      });",
+  "    } else if (index === 0) {",
+  "      // Add text input for symbol search",
+  "      $('<input type=\"text\" placeholder=\"Search symbol\" style=\"width: 100%;\">')",
+  "        .appendTo(cell)",
+  "        .on('keyup change', function() {",
+  "          var val = $(this).val();",
+  "          column.search(val).draw();",
+  "        });",
   "    } else {",
   "      $(cell).html('');",
   "    }",
   "  });",
   "}"
 )
-
   ),
   escape = FALSE,
   rownames = FALSE,
-  class = "display nowrap"  # Apply no-wrap class here to prevent wrapping of text in cells
+  class = "display nowrap"
 )
+
 
 ```
 
@@ -638,17 +662,24 @@ datatable(
   "      column.data().unique().sort().each(function(d) {",
   "        select.append('<option value=\"' + d + '\">' + d + '</option>');",
   "      });",
+  "    } else if (index === 0) {",
+  "      // Add text input for symbol search",
+  "      $('<input type=\"text\" placeholder=\"Search symbol\" style=\"width: 100%;\">')",
+  "        .appendTo(cell)",
+  "        .on('keyup change', function() {",
+  "          var val = $(this).val();",
+  "          column.search(val).draw();",
+  "        });",
   "    } else {",
   "      $(cell).html('');",
   "    }",
   "  });",
   "}"
 )
-
   ),
   escape = FALSE,
   rownames = FALSE,
-  class = "display nowrap"  # Apply no-wrap class here to prevent wrapping of text in cells
+  class = "display nowrap"
 )
 
 ```
