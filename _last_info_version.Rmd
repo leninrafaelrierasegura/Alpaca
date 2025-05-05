@@ -159,16 +159,14 @@ format_market_cap <- function(x) {
 }
 ```
 
-
-# Data description
-
-
 Data is downloaded daily from [here](https://www.nasdaq.com/market-activity/stocks/screener). The `lastsale` value reported in the previous link is the open price when the market closes, according to this [website](https://finance.yahoo.com/).
 
 Data collection started on April 23, 2025.
 
+This code runs daily. So it may happen that the same data is retrieved on both Saturday and Sunday (the data from Friday). So the column `date` is ignored here `distinct(across(-date), .keep_all = TRUE)` because it may be different just because the same data was retrieved in different dates.
 
-```{r}
+```
+{r}
 aux_day <- Sys.Date()
 day_of_week <- weekdays(aux_day)
 
@@ -265,124 +263,80 @@ stock_data_to_save <- stock_data_filled |>
 saveRDS(stock_data_to_save, here("data/cummulative_stock_data.RDS"))
 ```
 
-# Filters
-
-Let `X_k(t_i)` denote the value of a stock `X_k` at day `t_i`, where `i= 0,...,N`. Let `pct X_k(t_i)` denote the percentage change of `X_k(t_i)` with respect to `X_k(t_0)`, i.e., `pct X_k(t_i) = (X_k(t_i) - X_k(t_0))/X_k(t_0) * 100 `. For each stock `X_k`, the filters are as follows:
-
-- The first filter is that `X_k(t_0) <= X_k(t_N)`, i.e., the stock must have a positive growth trend within the period of analysis.
-
-- The second filter is that `0.8*X_k(t_{i-1}) <= X_k(t_i) <= 2*X_k(t_{i-1})`, i.e., the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%).
-
-- The third filter is that `max{ pct X_k(t_0), ..., pct X_k(t_{N-1})} / 2 <= pct X_k(t_N)`, i.e., the final price growth is at least half of the highest growth.
-
-- The fourth filter is that `min{|pct X_k(t_0)|, ..., |pct X_k(t_{N-1})|} <= pct X_k(t_N)`, i.e., the stock must not have fallen more than what it has grown.
 
 ```{r}
-#stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS"))
-
-stocks_data_with_comment_column <- stock_data_to_save |> 
-  mutate(comment = NA_character_)
-
-# The following ensures that we only keep stocks that have a positive growth trend
-stocks_data_grow <- stocks_data_with_comment_column |> 
+stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS")) 
+# The first filter ensures that we only keep stocks that have a positive growth trend  
+# The second filter ensures that the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%)
+stocks_data_grow <- stock_data_to_save |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
-  mutate(comment = if_else(
-    is.na(comment) & !(first(lastsale) <= last(lastsale)), 
-    "did not pass X(t_0) <= X(t_N)", 
-    comment
-  )) |>
+  filter(first(lastsale) <= last(lastsale)) |> # ensure positive growth trend
+  filter({
+    next_adj <- lead(lastsale)
+    all((next_adj > 0.8 * lastsale) & (next_adj < 2 * lastsale), na.rm = TRUE)
+  }) |>
   ungroup()
 
-# The following ensures that the next day price is at most twice and at least 80% of the last price (from day to day it can only fall 20%)
-stocks_data_window <- stocks_data_grow |>
-  group_by(symbol) |>
-  arrange(date, .by_group = TRUE) |>
-  mutate(
-    comment = if_else(
-      is.na(comment) & !all((lead(lastsale) > 0.8 * lastsale) & (lead(lastsale) < 2 * lastsale), na.rm = TRUE),
-      "did not pass 0.8*X(t_{i-1}) <= X(t_i) <= 2*X(t_{i-1})", 
-      comment
-    )) |>
-  ungroup()
-
-
-# Compute the percentage change from the start date (daily and accumulated)
+# Compute the percentage change from the start date 
 # Keep only those stocks where the final price growth is at least half of the highest growth (before the end).
-stock_data_pct_change <- stocks_data_window |>
+stock_data_pct_change <- stocks_data_grow |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
   mutate(daily_pct_change = (lastsale - lag(lastsale)) / lag(lastsale) * 100,
          accum_pct_change = (lastsale - first(lastsale)) / first(lastsale) * 100) |>
-  mutate(comment = if_else(
-    is.na(comment) & !((max(head(accum_pct_change, -1)) / 2) <= last(accum_pct_change)),
-    "did not pass max{pct X(t_0), ..., pct X(t_{N-1})} / 2 <= pct X(t_N)", 
-    comment
-  )) |>
+  filter((max(head(accum_pct_change, -1)) / 2) <= last(accum_pct_change)) |> # max{first, ..., last-1} / 2 <= last
   ungroup() 
 
 # Filter symbols that have fallen (anytime) more that what they have grown (at the end)
-stock_data_pct_change_that_grow <- stock_data_pct_change |>
+symbols_with_negative_pct_change <- stock_data_pct_change |>
   group_by(symbol) |>
   arrange(date, .by_group = TRUE) |>
-  mutate(
-    comment = if_else(
-      is.na(comment) &
-      any(accum_pct_change < 0) & !(abs(min(head(accum_pct_change, -1))) <= last(accum_pct_change)),
-      "did not pass min{|pct X(t_0)|, ..., |pct X(t_{N-1})|} <= pct X(t_N)",
-      comment
-    )
-  ) |>
-  ungroup()
+  filter(any(accum_pct_change < 0)) |> # this filter is so that the next make sense
+  filter(abs(min(accum_pct_change)) > last(accum_pct_change)) |>
+  ungroup() |>
+  distinct(symbol) |>
+  pull(symbol)
 
-# Removes the first date (the one that was used to compute the daily percentage change)
+# Filter out those symbols from stock_data_pct_change
+# This ensures that have grown more that they have fallen
+stock_data_pct_change_that_grow <- stock_data_pct_change |>
+  filter(!symbol %in% symbols_with_negative_pct_change)
+
 aux <- stock_data_pct_change_that_grow |>
   filter(date != min(date))
 
-AUX_to_rank <- aux |>
-  filter(is.na(comment))
 
 # From here on there are no more filters
-```
 
 
-# Rankings
-
-Let `R_j` be the rank of the stocks according to their percentage change `pct X_k(t_i)` at day `t_i`. The ranks is computed as follows:
-
-- `Accumulated rank`. More complicated than the others. The idea is to compute the rank of each stock at each date, and then accumulate the ranks according to the following logic:
-
-  - If `R_j(t_i) >= R_j(t_{i-1})`, then `R_j(t_i) = R_j(t_{i-1}) + R_j(t_i)`.
-  - If `R_j(t_i) < R_j(t_{i-1})`, then `R_j(t_i) = R_j(t_{i-1}) - R_j(t_i)`.
-
-  This means that if a stock has a better rank than the previous day, its accumulated rank increases by the value of its current rank. If it has a worse rank, its accumulated rank decreases by the value of its current rank.
-
-- `Sum of ranks`. This is simply `R_1 + R_2 + ... + R_N`.
-
-- `Last day rank`. This is simply `R_N`.
-
-
-
-```{r}
 # The following contains the information of the surviving symbols
 info_of_surviving_symbols <- aux |>
-  filter(date == max(date)) |> # so we get the last market cap and volume, for example
+  filter(date == max(date)) |>
   select(-date, -lastsale, -daily_pct_change) |>
   mutate(marketCap_ = format_market_cap(marketCap),
          accum_pct_change = round(accum_pct_change, 2))
+  
+countries <- info_of_surviving_symbols |>
+  select(country) |>
+  distinct() |>
+  arrange(country) |>
+  pull(country)
 
-# The following is the list of symbols that passed all filters
-info_of_those_that_passed_all_filters <- info_of_surviving_symbols |>
-  filter(is.na(comment)) |>
-  select(-comment)
+industries <- info_of_surviving_symbols |>
+  select(industry) |>
+  distinct() |>
+  arrange(industry) |>
+  pull(industry)
 
-# The following is the list of symbols that did not pass all filters
-reason_for_those_that_did_not_pass_all_filters <- info_of_surviving_symbols |>
-  filter(!is.na(comment)) |>
-  select(symbol, comment)
- 
+sectors <- info_of_surviving_symbols |>
+  select(sector) |>
+  distinct() |>
+  arrange(sector) |>
+  pull(sector)
+
 # Compute the rank for each date
-aux_ranked <- AUX_to_rank |> 
+aux_ranked <- aux |> 
   group_by(date) |>
   arrange(accum_pct_change) |>
   mutate(rank = row_number()) |>
@@ -442,28 +396,28 @@ acc_rank <- ranking_accumulated[, c(1,ncol(ranking_accumulated))] |>
 
 # Augment the ranks with info
 aug_acc_rank <- acc_rank |>
-  inner_join(info_of_those_that_passed_all_filters, by = "symbol") |>
+  inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(acc_rank)) |>
   select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
-  mutate(rank = row_number()) |>
   mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
+  mutate(rank = row_number()) |>
   select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
 
 
 aug_sum_rank <- sum_rank |>
-  inner_join(info_of_those_that_passed_all_filters, by = "symbol") |>
+  inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(sum_rank)) |>
   select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
-  mutate(rank = row_number()) |>
   mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
+  mutate(rank = row_number()) |>
   select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
 
 aug_last_day_rank <- last_day_rank |>
-  inner_join(info_of_those_that_passed_all_filters, by = "symbol") |>
+  inner_join(info_of_surviving_symbols, by = "symbol") |>
   arrange(desc(last_rank)) |>
   select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
-  mutate(rank = row_number()) |>
   mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
+  mutate(rank = row_number()) |>
   select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
 ```
 
@@ -730,28 +684,6 @@ datatable(
 )
 
 ```
-
-***************
-
-# Reason for ranking dismissal
-
-***************
-
-```{r}
-datatable(
-  reason_for_those_that_did_not_pass_all_filters,
-  filter = "top",         # Show filter boxes on top of the columns
-  options = list(
-    pageLength = 5,
-    autoWidth = TRUE,
-    columnDefs = list(
-      list(targets = 1, searchable = TRUE)  # Disable search on the 'comment' column
-    )
-  )
-)
-```
-
-
 
 ```{r}
 print(paste("This was executed on:", Sys.time()))

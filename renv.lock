@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.4.3",
+    "Version": "4.5.0",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -301,7 +301,7 @@
     },
     "grateful": {
       "Package": "grateful",
-      "Version": "0.2.11",
+      "Version": "0.2.12",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -313,7 +313,7 @@
         "rstudioapi",
         "utils"
       ],
-      "Hash": "bc7a709941fb8b3b6ce90aae0ae99e34"
+      "Hash": "f67b9143cd353a75636e0ee2ab411570"
     },
     "here": {
       "Package": "here",
@@ -879,13 +879,13 @@
     },
     "utf8": {
       "Package": "utf8",
-      "Version": "1.2.4",
+      "Version": "1.2.5",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "62b65c52671e6665f803ff02954446e9"
+      "Hash": "ed553a57e9eb21f4d0298fbc1ad7b4df"
     },
     "uuid": {
       "Package": "uuid",
