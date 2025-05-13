@@ -278,7 +278,7 @@ Let `X_k(t_i)` denote the value of a stock `X_k` at day `t_i`, where `i= 0,...,N
 - The fourth filter is that `min{|pct X_k(t_0)|, ..., |pct X_k(t_{N-1})|} <= pct X_k(t_N)`, i.e., the stock must not have fallen more than what it has grown.
 
 ```{r}
-#stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS"))
+# stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS"))
 
 stocks_data_with_comment_column <- stock_data_to_save |> 
   mutate(comment = NA_character_)
@@ -367,7 +367,7 @@ Let `R_j` be the rank of the stocks according to their percentage change `pct X_
 # The following contains the information of the surviving symbols
 info_of_surviving_symbols <- aux |>
   filter(date == max(date)) |> # so we get the last market cap and volume, for example
-  select(-date, -lastsale, -daily_pct_change) |>
+  select(-date, -daily_pct_change) |>
   mutate(marketCap_ = format_market_cap(marketCap),
          accum_pct_change = round(accum_pct_change, 2))
 
@@ -444,27 +444,27 @@ acc_rank <- ranking_accumulated[, c(1,ncol(ranking_accumulated))] |>
 aug_acc_rank <- acc_rank |>
   inner_join(info_of_those_that_passed_all_filters, by = "symbol") |>
   arrange(desc(acc_rank)) |>
-  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
+  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, lastsale, name) |>
   mutate(rank = row_number()) |>
   mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
-  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
+  select(symbol, acc_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, lastsale, name)
 
 
 aug_sum_rank <- sum_rank |>
   inner_join(info_of_those_that_passed_all_filters, by = "symbol") |>
   arrange(desc(sum_rank)) |>
-  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
+  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, lastsale, name) |>
   mutate(rank = row_number()) |>
   mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
-  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
+  select(symbol, sum_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, lastsale, name)
 
 aug_last_day_rank <- last_day_rank |>
   inner_join(info_of_those_that_passed_all_filters, by = "symbol") |>
   arrange(desc(last_rank)) |>
-  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, name) |>
+  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, lastsale, name) |>
   mutate(rank = row_number()) |>
   mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")) |>
-  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, name)
+  select(symbol, last_rank, marketCap, marketCap_, accum_pct_change, country, industry, sector, ipoyear, volume, rank, lastsale, name)
 ```
 
 ***************
