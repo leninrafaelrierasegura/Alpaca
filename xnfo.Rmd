@@ -165,105 +165,8 @@ format_market_cap <- function(x) {
 
 Data is downloaded daily from [here](https://www.nasdaq.com/market-activity/stocks/screener). The `lastsale` value reported in the previous link is the open price when the market closes, according to this [website](https://finance.yahoo.com/).
 
-Data collection started on April 23, 2025.
+We only consider data from August 07, 2025. This is the day when the reciprocal US tariffs were put in place.
 
-
-```{r}
-aux_day <- Sys.Date()
-day_of_week <- weekdays(aux_day)
-
-if (day_of_week == "Monday") {
-  today <- aux_day - 3
-} else if (day_of_week %in% c("Tuesday", "Wednesday", "Thursday", "Friday")) {
-  today <- aux_day - 1
-} else {
-  today <- aux_day  # or handle Saturday/Sunday however you want
-}
-# Define the API URL
-url <- "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true"
-# Set headers to mimic a browser
-headers <- add_headers(`User-Agent` = "Mozilla/5.0")
-# Send GET request
-response <- GET(url, headers)
-# Check status
-if (status_code(response) == 200) {
-  # Parse JSON content
-  content_json <- content(response, "text", encoding = "UTF-8")
-  data_list <- fromJSON(content_json, flatten = TRUE)
-
-  # Extract rows from JSON
-  stock_data <- data_list$data$rows
-  # Add current date column
-  stock_data$date <- today
-
-  # Create filename with today's date
-  file_name <- paste0("nasdaq_screener_", today, ".csv")
-
-  # Save to CSV
-  write_csv(stock_data, here("data", file_name))
-  cat("✅ Data saved to", file_name, "\n")
-} else {
-  cat("❌ Failed to fetch data. Status code:", status_code(response), "\n")
-}
-
-# The following line should replace the next following line
-today_stock_data <- read_csv(here("data", file_name))  |>
-  filter(nchar(symbol)<5) |> # filter out stocks with more than 4 characters (not tradeable)
-  filter(!grepl("\\^", symbol)) |> # remove symbols containing ^
-  select(-url, -netchange, -pctchange) |> # remove unnecessary columns
-  mutate(lastsale = as.numeric(gsub("[$,]", "", lastsale))) |># remove $ and , from lastsale and make it numeric
-  select(symbol, date, lastsale, everything()) # reorder columns
-
-# Remove symbols that are not longer being traded
-cummulative_stock_data <- readRDS(here("data/cummulative_stock_data.RDS")) |>
-  filter(symbol %in% today_stock_data$symbol)
-
-# The following two instructions deals with new_data being added when it is already there.
-# This might happen when the stock market is closed during weekdays
-
-# Keep only rows from today_stock_data that are NOT already in cummulative_stock_data
-new_today_stock_data <- anti_join(today_stock_data, 
-                                  cummulative_stock_data, 
-                                  by = setdiff(names(today_stock_data), "date")) # Identify columns to match (everything except 'date')
-
-clean_cummulative_stock_data <- bind_rows(cummulative_stock_data, new_today_stock_data) |>
-  arrange(symbol, date) |>
-  select(symbol, date, lastsale, marketCap, country, industry, sector, ipoyear, volume, name)
-
-# Get unique dates from the dataset
-unique_dates <- sort(unique(clean_cummulative_stock_data$date))
-
-# Step 1: Expand each symbol to all existing dates
-stock_data_expanded <- clean_cummulative_stock_data |>
-  group_by(symbol) |>
-  complete(date = unique_dates) |>
-  ungroup()
-
-# Step 2: Fill backward for multiple columns
-columns_to_fill <- c(
-  "lastsale", "marketCap", "country", "industry", 
-  "sector", "ipoyear", "volume", "name"
-)
-
-stock_data_filled <- stock_data_expanded |>
-  group_by(symbol) |>
-  arrange(date, .by_group = TRUE) |>
-  mutate(across(all_of(columns_to_fill),
-                ~ zoo::na.locf(.x, fromLast = TRUE, na.rm = FALSE))) |> # filling from the last available value backward
-  mutate(across(all_of(columns_to_fill),
-                ~ zoo::na.locf(.x, fromLast = FALSE, na.rm = FALSE))) |> # filling from the first available value forward
-  ungroup() |>
-  arrange(symbol, date)
-
-stock_data_to_save <- stock_data_filled |>
-  group_by(symbol) |>
-  arrange(date, .by_group = TRUE) |>
-  filter(!any(is.na(lastsale))) |>
-  ungroup() |>
-  arrange(symbol, date)
-
-saveRDS(stock_data_to_save, here("data/cummulative_stock_data.RDS"))
-```
 
 # Filters
 
@@ -278,7 +181,12 @@ Let `X_k(t_i)` denote the value of a stock `X_k` at day `t_i`, where `i= 0,...,N
 - The fourth filter is that `min{|pct X_k(t_0)|, ..., |pct X_k(t_{N-1})|} <= pct X_k(t_N)`, i.e., the stock must not have fallen more than what it has grown.
 
 ```{r}
-# stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS"))
+stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS")) |>
+  group_by(symbol) |>
+  arrange(date, .by_group = TRUE) |>
+  filter(date >= as.Date("2025-08-07")) |>
+  ungroup() |>
+  arrange(symbol, date)
 
 stocks_data_with_comment_column <- stock_data_to_save |> 
   mutate(comment = NA_character_)
@@ -762,13 +670,6 @@ print(paste("This was executed on:", Sys.time(),
             range_of_analysis[2]))
 ```
 
-
-```{r}
-slackr_msg(
-  text = "New update at <https://leninrafaelrierasegura.github.io/Alpaca/info.html>",
-  channel = "#ranks"
-)
-```
 
 
 ```{r}

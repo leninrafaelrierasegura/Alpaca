@@ -4,4 +4,6 @@ title: "Alpaca"
 
 Welcome to Alpaca!
 
-Go to [rankings](https://leninrafaelrierasegura.github.io/Alpaca/info.html).
+Go to [Rankings - from April 23, 2025](https://leninrafaelrierasegura.github.io/Alpaca/info.html).
+
+Go to [Rankings - from August 07, 2025](https://leninrafaelrierasegura.github.io/Alpaca/xnfo.html).

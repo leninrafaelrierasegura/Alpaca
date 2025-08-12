@@ -7,8 +7,10 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
-    - text: "Rankings"
+    - text: "Rankings - from April 23, 2025"
       href: info.html
+    - text: "Rankings - from August 07, 2025"
+      href: xnfo.html
   right:
     - icon: fa-github
       href: https://github.com/leninrafaelrierasegura/Alpaca
