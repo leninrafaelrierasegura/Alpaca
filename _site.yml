@@ -11,6 +11,8 @@ navbar:
       href: info.html
     - text: "Rankings - from August 07, 2025"
       href: xnfo.html
+    - text: "Fastest doubling stocks"
+      href: ynfo.html
   right:
     - icon: fa-github
       href: https://github.com/leninrafaelrierasegura/Alpaca
