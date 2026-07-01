@@ -1,5 +1,5 @@
 ---
-title: "Alpaca"
+title: "Fastest doubling stocks"
 date: "`r format(Sys.time(), '%d-%m-%Y.')`"
 output:
   html_document:
@@ -220,17 +220,19 @@ doubling_speed <- stocks_data_grow |>
     sector   = last(sector),
     industry = last(industry),
     name     = last(name),
+    marketCap = format_market_cap(last(marketCap)),
+    ipoyear   = last(ipoyear),
 
     .groups = "drop"
   ) |>
   mutate(half_price = last_price / 2) |>
   filter(!is.na(half_date)) |>
-  arrange(days_to_double)
+  arrange(days_to_double) 
 ```
 
 ```{r results='asis'}
 datatable(
-  doubling_speed,
+  doubling_speed |> mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")),
   filter = "none",
   options = list(
     pageLength = 10,
@@ -371,65 +373,65 @@ plot_list <- map(
 
 ### Rank 1-20
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[1]]
 ```
 
 
 ### Rank 21-40
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[2]]
 ```
 
 
 ### Rank 41-60
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[3]]
 ```
 
 ### Rank 61-80
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[4]]
 ```
 
 
 ### Rank 81-100
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[5]]
 ```
 
 ### Rank 101-120
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[6]]
 ```
 
 
 ### Rank 121-140
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[7]]
 ```
 
 ### Rank 141-160
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[8]]
 ```
 
 ### Rank 161-180
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[9]]
 ```
 
 ### Rank 181-200
 
-```{r, out.width='100%'}
+```{r, out.width='50%'}
 plot_list[[10]]
 ```
 

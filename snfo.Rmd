@@ -1,0 +1,399 @@
+---
+title: "Alpaca"
+date: "`r format(Sys.time(), '%d-%m-%Y.')`"
+output:
+  html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    highlight: pygments
+    theme: flatly
+    code_folding: hide # class.source = "fold-hide" to hide code and add a button to show it
+    df_print: paged
+    # toc: true
+    # toc_float:
+    #   collapsed: true
+    #   smooth_scroll: true
+    number_sections: false
+    fig_caption: true
+    code_download: true
+always_allow_html: true
+bibliography: 
+  - grateful-refs.bib
+header-includes:
+  - \newcommand{\ar}{\mathbb{R}}
+  - \newcommand{\llav}[1]{\left\{#1\right\}}
+  - \newcommand{\pare}[1]{\left(#1\right)}
+  - \newcommand{\Ncal}{\mathcal{N}}
+  - \newcommand{\Vcal}{\mathcal{V}}
+  - \newcommand{\Ecal}{\mathcal{E}}
+  - \newcommand{\Wcal}{\mathcal{W}}
+---
+
+```{r xaringanExtra-clipboard, echo = FALSE}
+htmltools::tagList(
+  xaringanExtra::use_clipboard(
+    button_text = "<i class=\"fa-solid fa-clipboard\" style=\"color: #00008B\"></i>",
+    success_text = "<i class=\"fa fa-check\" style=\"color: #90BE6D\"></i>",
+    error_text = "<i class=\"fa fa-times-circle\" style=\"color: #F94144\"></i>"
+  ),
+  rmarkdown::html_dependency_font_awesome()
+)
+```
+
+
+```{css, echo = FALSE}
+body .main-container {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+body {
+  max-width: 100% !important;
+}
+
+body, td {
+   font-size: 16px;
+}
+code.r{
+  font-size: 14px;
+}
+pre {
+  font-size: 14px
+}
+.custom-box {
+  background-color: #f5f7fa; /* Light grey-blue background */
+  border-color: #e1e8ed; /* Light border color */
+  color: #2c3e50; /* Dark text color */
+  padding: 15px; /* Padding inside the box */
+  border-radius: 5px; /* Rounded corners */
+  margin-bottom: 20px; /* Spacing below the box */
+}
+.caption {
+  margin: auto;
+  text-align: center;
+  margin-bottom: 20px; /* Spacing below the box */
+}
+```
+
+<div style="color: blue;">
+********
+**Press the Show button below to reveal the code.**
+
+********
+</div>
+
+
+
+```{r, echo= TRUE}
+# Set global options for all code chunks
+knitr::opts_chunk$set(
+  # Disable messages printed by R code chunks
+  message = FALSE,    
+  # Disable warnings printed by R code chunks
+  warning = FALSE,    
+  # Show R code within code chunks in output
+  echo = TRUE,        
+  # Include both R code and its results in output
+  include = TRUE,     
+  # Evaluate R code chunks
+  eval = TRUE,       
+  # Enable caching of R code chunks for faster rendering
+  cache = FALSE,      
+  # Align figures in the center of the output
+  fig.align = "center",
+  # Enable retina display for high-resolution figures
+  retina = 2,
+  # Show errors in the output instead of stopping rendering
+  error = TRUE,
+  # Do not collapse code and output into a single block
+  collapse = FALSE
+)
+# Start the figure counter
+fig_count <- 0
+# Define the captioner function
+captioner <- function(caption) {
+  fig_count <<- fig_count + 1
+  paste0("Figure ", fig_count, ": ", caption)
+}
+# Define the function to truncate a number to two decimal places
+truncate_to_two <- function(x) {
+  floor(x * 100) / 100
+}
+```
+
+```{r}
+# Load required libraries
+library(httr)
+library(jsonlite)
+library(readr)
+library(dplyr)
+library(zoo) # to use na.locf
+library(tidyr) # to use pivot_wider
+library(slackr)
+library(grateful)
+library(here)
+library(DT) 
+
+initial_date <- as.Date("2025-04-23")
+source(here("keys.R"))
+slackr_setup(token = token)
+
+format_market_cap <- function(x) {
+  sapply(x, function(val) {
+    if (is.na(val)) {
+      return("NA")
+    }
+    
+    val <- as.numeric(val)
+    
+    if (val >= 1e12) {
+      return(sprintf("%.1fT", val / 1e12))
+    } else if (val >= 1e9) {
+      return(sprintf("%.1fB", val / 1e9))
+    } else if (val >= 1e6) {
+      return(sprintf("%.1fM", val / 1e6))
+    } else if (val >= 1e3) {
+      return(sprintf("%.1fk", val / 1e3))
+    } else {
+      return(as.character(val))
+    }
+  })
+}
+```
+
+
+# Data description
+
+
+Data is downloaded daily from [here](https://www.nasdaq.com/market-activity/stocks/screener). The `lastsale` value reported in the previous link is the open price when the market closes, according to this [website](https://finance.yahoo.com/).
+
+We only consider data from August 07, 2025. This is the day when the reciprocal US tariffs were put in place.
+
+
+# Filters
+
+Let `X_k(t_i)` denote the value of a stock `X_k` at day `t_i`, where `i= 0,...,N`. Let `pct X_k(t_i)` denote the percentage change of `X_k(t_i)` with respect to `X_k(t_0)`, i.e., `pct X_k(t_i) = (X_k(t_i) - X_k(t_0))/X_k(t_0) * 100 `. For each stock `X_k`, the filters are as follows:
+
+- The first filter is that `X_k(t_0) <= X_k(t_N)`, i.e., the stock must have a positive growth trend within the period of analysis.
+
+# More stuff
+
+Suppose a stock has price $P_{\mathrm{start}}$ at time $t_{\mathrm{start}}$ and
+price $P_{\mathrm{end}}$ at time $t_{\mathrm{end}}$, with
+$\Delta t=t_{\mathrm{end}}-t_{\mathrm{start}}$ measured in days. There are
+several natural ways to quantify the speed at which the stock has grown.
+
+The simplest measure is the *absolute slope*,
+\[
+m_{\mathrm{abs}}
+=
+\frac{P_{\mathrm{end}}-P_{\mathrm{start}}}{\Delta t},
+\]
+which measures the average increase in price per day. While intuitive,
+this measure depends strongly on the stock's initial price, so expensive
+stocks tend to have larger values even if their relative growth is modest.
+
+To remove this dependence, one can normalize by the initial price and use
+the *fractional slope*,
+\[
+m_{\mathrm{frac}}
+=
+\frac{P_{\mathrm{end}}-P_{\mathrm{start}}}
+{P_{\mathrm{start}}\Delta t},
+\]
+which measures the average fractional (or percentage) increase per day.
+This metric allows a fair comparison between stocks with different price
+levels.
+
+A more natural measure from a financial perspective is the
+*log-growth rate*,
+\[
+m_{\log}
+=
+\frac{\log(P_{\mathrm{end}}/P_{\mathrm{start}})}
+{\Delta t},
+\]
+which assumes prices grow multiplicatively rather than linearly. If the
+stock followed an exponential growth model,
+\[
+P(t)=P_{\mathrm{start}}e^{m_{\log}t},
+\]
+then $m_{\log}$ would be the exact continuous growth rate. Moreover,
+ranking stocks by $m_{\log}$ is equivalent to ranking them by their
+compound annual growth rate (CAGR), making it a widely used measure in
+quantitative finance.
+
+As an illustration, consider two stocks observed over the same period of
+$100$ days.
+
+As an illustration, consider two stocks observed over the same period of 100 days.
+
+| Stock | Start | End | Days | Absolute slope $\frac{P_{\mathrm{end}}-P_{\mathrm{start}}}{\Delta t}$ | Fractional slope $\frac{P_{\mathrm{end}}-P_{\mathrm{start}}}{P_{\mathrm{start}}\Delta t}$ | Log-growth rate $\frac{\log(P_{\mathrm{end}}/P_{\mathrm{start}})}{\Delta t}$ |
+|:------|------:|----:|-----:|----------------:|----------------:|----------------:|
+| A | \$1000 | \$1100 | 100 | \$1.00/day | 0.0010/day (0.10%/day) | 0.000953/day |
+| B | \$10 | \$30 | 100 | \$0.20/day | 0.0200/day (2.00%/day) | 0.010986/day |
+
+The resulting rankings are
+
+| Metric | Ranking |
+|:-------|:--------|
+| Absolute slope | $A > B$ |
+| Fractional slope | $B > A$ |
+| Log-growth rate | $B > A$ |
+
+Although Stock A gains more dollars per day, Stock B grows much faster
+relative to its initial value. Consequently, the fractional slope and
+log-growth rate provide more meaningful measures of growth when comparing
+stocks with different initial prices.
+
+
+```{r}
+stock_data_to_save <- readRDS(here("data/cummulative_stock_data.RDS")) |>
+  group_by(symbol) |>
+  arrange(date, .by_group = TRUE) |>
+  filter(date >= as.Date("2026-04-01")) |>
+  ungroup() |>
+  arrange(symbol, date)
+
+stocks_data_with_comment_column <- stock_data_to_save |> 
+  mutate(comment = NA_character_)
+
+# The following ensures that we only keep stocks that have a positive growth trend
+stocks_data_grow <- stocks_data_with_comment_column |> 
+  group_by(symbol) |>
+  arrange(date, .by_group = TRUE) |>
+  mutate(comment = if_else(
+    is.na(comment) & !(first(lastsale) <= last(lastsale)), 
+    "did not pass X(t_0) <= X(t_N)", 
+    comment
+  )) |>
+  ungroup()
+
+```
+
+```{r}
+slope_comp <- stocks_data_grow |>
+  filter(is.na(comment)) |>
+  group_by(symbol) |>
+  arrange(date, .by_group = TRUE) |>
+  summarise(
+    last_date  = last(date),
+    last_price = last(lastsale),
+    first_date = first(date),
+    first_price = first(lastsale),
+
+    half_date = {
+      threshold <- last(lastsale) / 2
+      idx <- which(lastsale <= threshold)
+      if (length(idx) == 0) as.Date(NA) else max(date[idx])
+    },
+
+    days_to_double = as.numeric(last_date - half_date),
+    days_from_start = as.numeric(last_date - first_date),
+
+    country  = last(country),
+    sector   = last(sector),
+    industry = last(industry),
+    name     = last(name),
+    marketCap = format_market_cap(last(marketCap)),
+    ipoyear   = last(ipoyear),
+
+    .groups = "drop"
+  ) |>
+  mutate(half_price = last_price / 2) |>
+  filter(!is.na(half_date)) |>
+  arrange(days_to_double) |> 
+  mutate(frac_slope = (last_price - first_price) / (first_price * days_from_start)) |>
+  mutate(log_slope = log(last_price / first_price) / days_from_start) |>
+  select(-last_date, -first_date, -half_date, -half_price, -days_from_start)|>
+  relocate(marketCap, frac_slope, log_slope, ipoyear, name, .after = days_to_double)
+```
+
+```{r results='asis'}
+datatable(
+  slope_comp |> mutate(symbol = paste0("<a href='https://finance.yahoo.com/quote/", symbol, "' target='_blank'>", symbol, "</a>")),
+  filter = "none",
+  options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = "lrtip",
+    initComplete = JS(
+      "function(settings) {",
+      "  var api = this.api();",
+      "  var header = $(api.table().header());",
+      "  var filterRow = $('<tr>').appendTo(header);",
+
+      "  var colIndices = { country: 9, sector: 10, industry: 11 };",
+
+      "  var industryToSector = {};",
+
+      "  var allData = api.rows().data();",
+      "  allData.each(function(row) {",
+      "    var industry = row[colIndices.industry];",
+      "    var sector = row[colIndices.sector];",
+      "    if (industry && sector) {",
+      "      industryToSector[industry] = sector;",
+      "    }",
+      "  });",
+
+      "  api.columns().every(function(index) {",
+      "    var column = this;",
+      "    var cell = $('<th>').appendTo(filterRow);",
+
+      "    if ([colIndices.country, colIndices.sector, colIndices.industry].includes(index)) {",
+
+      "      var select = $('<select><option value=\"\"></option></select>')",
+      "        .appendTo(cell)",
+      "        .on('change', function() {",
+      "          var val = $.fn.dataTable.util.escapeRegex($(this).val());",
+      "          column.search(val ? '^' + val + '$' : '', true, false).draw();",
+
+      "          if (index === colIndices.sector) {",
+      "            var selectedSector = $(this).val();",
+      "            var industrySelect = filterRow.find('th').eq(colIndices.industry).find('select');",
+      "            industrySelect.val('');",
+      "            industrySelect.empty().append('<option value=\"\"></option>');",
+
+      "            var industries = Object.keys(industryToSector)",
+      "              .filter(function(ind) {",
+      "                return selectedSector === '' || industryToSector[ind] === selectedSector;",
+      "              })",
+      "              .sort();",
+
+      "            industries.forEach(function(ind) {",
+      "              industrySelect.append('<option value=\"' + ind + '\">' + ind + '</option>');",
+      "            });",
+
+      "            api.column(colIndices.industry).search('', true, false).draw();",
+      "          }",
+      "        });",
+
+      "      column.data().unique().sort().each(function(d) {",
+      "        select.append('<option value=\"' + d + '\">' + d + '</option>');",
+      "      });",
+
+      "    } else if (index === 0) {",
+
+      "      $('<input type=\"text\" placeholder=\"Search symbol\" style=\"width:100%;\">')",
+      "        .appendTo(cell)",
+      "        .on('keyup change', function() {",
+      "          column.search($(this).val()).draw();",
+      "        });",
+
+      "    } else {",
+      "      $(cell).html('');",
+      "    }",
+      "  });",
+      "}"
+    )
+  ),
+  escape = FALSE,
+  rownames = FALSE,
+  class = "display nowrap"
+)
+```
+
+# References
+
+```{r}
+cite_packages(output = "paragraph", out.dir = ".")
+```
+

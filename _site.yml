@@ -13,6 +13,8 @@ navbar:
       href: xnfo.html
     - text: "Fastest doubling stocks"
       href: ynfo.html
+    - text: "Slopes"
+      href: snfo.html
   right:
     - icon: fa-github
       href: https://github.com/leninrafaelrierasegura/Alpaca
